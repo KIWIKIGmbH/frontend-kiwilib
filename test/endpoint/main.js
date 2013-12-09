@@ -58,7 +58,7 @@ var log = (function(DOM){
         if( localStorage[KEY] ) domInput.checked = domInput.value = localStorage[KEY];
     }
 
-    DOM.getElementById('prefix').innerHTML = window.config.ENDPOINT_ROOT;
+    DOM.getElementById('prefix').innerHTML = utils.module.load('config').ENDPOINT_ROOT;
     var url    = DOM.getElementById('url');
     var method = DOM.getElementById('method');
     var data   = DOM.getElementById('data');

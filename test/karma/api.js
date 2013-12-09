@@ -1,6 +1,6 @@
 describe('API/JS',function() {
     it('should be loaded', function() { 
-        expect(window.config.ENDPOINT_ROOT).toBeDefined();
+        expect(utils.module.load('config').ENDPOINT_ROOT).toBeDefined();
         expect(api).toBeDefined();
     }); 
 });
@@ -11,7 +11,7 @@ describe('API/BackEnd',function() {
         var req = new XMLHttpRequest();
         req.open(
             opts.method||'POST',
-            window.config.ENDPOINT_ROOT+(opts.path||'/session/'),
+            utils.module.load('config').ENDPOINT_ROOT+(opts.path||'/session/'),
             true
         );
         req.setRequestHeader('Content-Type',opts.contentType||'application/json; charset=utf-8');

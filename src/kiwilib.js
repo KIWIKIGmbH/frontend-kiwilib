@@ -1,6 +1,7 @@
 window.kiwilib = (function(){
 
-    var api = utils.module.load('api');
+    var api    = utils.module.load('api');
+    var config = utils.module.load('config');
 
     var scaffold = { 
         user      : { 
@@ -194,7 +195,7 @@ window.kiwilib = (function(){
                             setTimeout(function(){
                                 elem.isOpen = false;
                                 dataChangeListeners.fire();
-                            },3000);
+                            },config.DOOR_OPEN_DURATION);
                         });
                     }; 
                     elem.permission.tag = { 

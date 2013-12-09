@@ -3,6 +3,8 @@
 //-> saves session key
 //-> maps results
 utils.module.save('endpoint', (function(){
+    var config = utils.module.load('config');
+
     //generic API HTTP req
     var sid = (function(){ 
         var STORAGE_KEY = 'session_id';
@@ -65,7 +67,7 @@ utils.module.save('endpoint', (function(){
                         if( param.callback ) param.callback(!isError&&resp || undefined);
                     }
                 }
-                var url = window.config.ENDPOINT_ROOT+param.url;
+                var url = config.ENDPOINT_ROOT+param.url;
                 if(param.method==='GET' && param.data) {
                     url += '?'+Object.keys(param.data).map(function(key){return key+'='+window.encodeURIComponent(param.data[key])}).join('&');
                 }
@@ -87,7 +89,7 @@ utils.module.save('endpoint', (function(){
             if(ret && ret.constructor===Number) {
                 //ret is a Number <=> server replies status code !== 200
                 //ret === status code
-                var errMsg = ret + ' ' + window.config.ENDPOINT_ROOT + '/' + path;
+                var errMsg = ret + ' ' + config.ENDPOINT_ROOT + '/' + path;
                 utils.assert(false,errMsg);
                 if( !endpoint._config.safeMode ) throw errMsg;
                 return fallback_ret;
