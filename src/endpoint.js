@@ -198,7 +198,7 @@ utils.module.save('endpoint', (function(){
                 map:function(elem){
                     elem['id']   = elem[elemType+'_id'];
                     delete         elem[elemType+'_id'];
-                    elem['name'] = elem[elemType+'_name'];
+                    elem['name'] = elem[elemType+'_name'] || 'no name';
                     delete         elem[elemType+'_name'];
                     elem.type    = elemType;
                     utils.assert(elem['groups'] && elem['groups'].constructor===Array && elem['groups'].length);
@@ -207,7 +207,7 @@ utils.module.save('endpoint', (function(){
                         group.isGroup = true;
                         group['id']   = group['group_id'];
                         delete          group['group_id'];
-                        group['name'] = group['group_name'];
+                        group['name'] = group['group_name'] || 'no name';
                         delete          group['group_name'];
                         return group;
                     });
@@ -261,7 +261,7 @@ utils.module.save('endpoint', (function(){
                     group.type    = 'user';
                     group['id'] = group['group_id'];
                     delete group['group_id'];
-                    group['name'] = group['group_name'];
+                    group['name'] = group['group_name'] || 'no name';
                     delete group['group_name'];
                     return group;
                 });
@@ -348,10 +348,8 @@ utils.module.save('endpoint', (function(){
                             default: [],
                             map: function(g){
                                 utils.assert(g['group_id'  ],  'group id expected');
-                              //utils.assert(g['group_name'],'group name expected');
-                                g['group_name'] = g['group_name'] || 'no name';
                                 g['id'  ] = g['group_id'  ];
-                                g['name'] = g['group_name'];
+                                g['name'] = g['group_name'] || 'no name';
                                 g.type    = elemType;
                                 g.isGroup = true;
                                 delete g['group_id'  ];
@@ -367,7 +365,7 @@ utils.module.save('endpoint', (function(){
                             map: function(elem){
                                 elem['id'] = elem[elemType+'_group'];
                                 delete elem[elemType+'_group'];
-                                elem['name'] = elem['group_name'];
+                                elem['name'] = elem['group_name'] || 'no name';
                                 delete elem['group_name'];
                                 return elem;
                             }

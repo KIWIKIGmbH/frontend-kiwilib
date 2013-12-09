@@ -2,7 +2,7 @@ window.kiwilib = (function(){
 
     var api = utils.module.load('api');
 
-    var scaffold = {
+    var scaffold = { 
         user      : { 
             session: { 
                 username: null,
@@ -38,22 +38,22 @@ window.kiwilib = (function(){
             } 
         }, 
         sensors   : { 
-            singles: [],
-            nodes  : [],
-            addGroup: function(name){
+            singles    : [],
+            nodes      : [],
+            addGroup   : function(name){
              api.sensors.groups.add(name,function(){load.all()});
            }
         }, 
         tags      : { 
-            singles: [],
-            nodes  : [],
-            addGroup: function(name){
+            singles    : [],
+            nodes      : [],
+            addGroup   : function(name){
              api.tags   .groups.add(name,function(){load.all()});
            }
         }, 
         users     : { 
-            nodes  : [],
-            addGroup: function(name){
+            nodes      : [],
+            addGroup   : function(name){
              api.users  .groups.add(name,function(){load.all()});
            }
         }, 
@@ -74,7 +74,7 @@ window.kiwilib = (function(){
             //
         }, 
         addDataChangeListener: function(l){dataChangeListeners.add(l)}
-    };
+    }; 
 
     var TYPES = ['user','sensor','tag'];
 
@@ -93,13 +93,15 @@ window.kiwilib = (function(){
     var load = { 
         permission: {
             table: function(){ 
-                utils.assert(scaffold['sensors'].singles.length);
-                scaffold['sensors'].singles.forEach(function(sensor){
+                utils.assert(scaffold.sensors.singles.length);
+                scaffold.sensors.singles.forEach(function(sensor){
                     api.sensors.permission.get(sensor.id,function(group_ids){
-                        sensor.permissions             = {};
-                        sensor.permissions.tag         = {};
-                        sensor.permissions.tag.groups  = group_ids;
-                        sensor.permissions.tag.singles = scaffold['tags'].singles.filter(function(tag){return group_ids.indexOf(tag.group_id)!==-1});
+                        sensor.permission.tag.groups  = group_ids;
+                        sensor.permission.tag.singles = scaffold['tags'].singles.filter(function(tag){
+                            utils.assert(tag.groups,'missing groups');
+                            return tag.groups.some(function(group){ return group_ids.indexOf(group.id)!==-1});
+                        }).map(function(tag){return tag.id});
+                        dataChangeListeners.fire();
                     });
                 });
             }, 
@@ -108,7 +110,7 @@ window.kiwilib = (function(){
                 .map(function(type){return scaffold[type+'s'].nodes})
                 .reduce(function(l,r){return l.concat(r)})
                 .forEach(function(node){
-                    delete node.permCurrent;
+                    delete node.permission.toSelected;
                 });
                 dataChangeListeners.fire();
 
@@ -119,7 +121,7 @@ window.kiwilib = (function(){
                         utils.assert( group_ids && group_ids.constructor === Array);
                         scaffold[selected.type==='sensor'?'tags':'sensors'].nodes.forEach(function(node){
                             if( !node.isGroup ) return;
-                            node.permCurrent = group_ids.indexOf(node['id'])!==-1?1:0;
+                            node.permission.toSelected = group_ids.indexOf(node['id'])!==-1?1:0;
                         });
                         dataChangeListeners.fire();
                     });
@@ -132,12 +134,60 @@ window.kiwilib = (function(){
             elemObj.nodes.length = 0;
 
             if( !api.user.isSigned() ) return;
-            console.log(1);
+
+            function addFcts(arr){ 
+                arr.forEach(function(elem){
+                  //elem.permList = {};
+                    utils.assert(TYPES.indexOf(elem.type)!==-1);
+                    utils.assert(elem.isGroup===true || elem.isGroup===undefined);
+                    utils.assert(type===elem.type,type + elem.type);
+                    if(elem.isGroup) {
+                        elem.remove = function(){ 
+                            api[type+'s'].groups.remove(elem.id,function(){load.all();});
+                        }; 
+                    }
+                    elem.toggleSelect = function(){ 
+                        if(type==='user' || elem.isGroup) return;
+
+                        if(scaffold.selection.selected && scaffold.selection.selected!==elem) scaffold.selection.selected.isSelected=false;
+                        elem.isSelected = !elem.isSelected;
+                        scaffold.selection.selected = elem.isSelected?elem:undefined;
+                        load.permission.fromSelected();
+                    }; 
+                    elem.permission = {
+                        toSelected: null,
+                        change: function(target,newPerm){ 
+                            if(elem.type==='user') return;
+
+                            utils.assert(newPerm===false||newPerm===true,'wrong JS type for newPerm==='+newPerm);
+
+                            var source = elem;
+                            if( !source.isGroup ) source = source.groups[0];
+                            utils.assert(source);
+                            if( !target ) target = scaffold.selection.selected;
+                            utils.assert(target);
+                            if( !target.isGroup ) target = target.groups[0];
+                            utils.assert(target);
+
+                            utils.assert(target.type!==source.type || target.type==='user');
+                            var tag_group_id = source.type==='tag'   ?source['id']:target['id'];
+                            var sen_group_id = source.type==='sensor'?source['id']:target['id'];
+                            api.tags.permission[newPerm?'add':'remove'](tag_group_id,sen_group_id,function(){
+                                load.permission.fromSelected();
+                            });
+                        } 
+                    };
+                    if(elem.childs) addFcts(elem.childs);
+                });
+            } 
 
             if(elemObj.singles) api[type+'s'].get(function(res){ 
                 elemObj.singles.length = 0;
-                res.forEach(function(elem){
-                    if( type==='sensor' ) elem.open = function(){ 
+                res.forEach(function(elem){ elemObj.singles.push(elem); });
+                addFcts(elemObj.singles);
+                elemObj.singles.forEach(function(elem){
+                    if( !type==='sensor' ) return;
+                    elem.open = function(){ 
                         api.sensors.open(elem.id,function(){
                             elem.isOpen = true;
                             dataChangeListeners.fire();
@@ -147,55 +197,26 @@ window.kiwilib = (function(){
                             },3000);
                         });
                     }; 
-                    elemObj.singles.push(elem);
+                    elem.permission.tag = { 
+                        groups  : [],
+                        singles : []
+                    }; 
                 });
+                if(type==='sensor') load.permission.table();
                 dataChangeListeners.fire();
             }); 
 
             api[type+'s'].groups.get(function(res){ 
                 elemObj.nodes.length = 0;
                 res.forEach(function(elem){ elemObj.nodes.push(elem); });
-                (function addFcts(arr){ 
-                    arr.forEach(function(elem){
-                      //elem.permList = {};
-                        utils.assert(TYPES.indexOf(elem.type)!==-1);
-                        utils.assert(elem.isGroup===true || elem.isGroup===undefined);
-                        utils.assert(type===elem.type,type + elem.type);
-                        if(elem.isGroup) {
-                            elem.remove = function(){ 
-                                api[type+'s'].groups.remove(elem.id,function(){load.all();});
-                            }; 
-                        }
-                        if(type!=='user' && !elem.isGroup) {
-                            elem.toggleSelect = function(){ 
-                                if(scaffold.selection.selected && scaffold.selection.selected!==elem) scaffold.selection.selected.isSelected=false;
-                                elem.isSelected = !elem.isSelected;
-                                scaffold.selection.selected = elem.isSelected?elem:undefined;
-                                load.permission.fromSelected();
-                            }; 
-                        }
-                        if(type!=='user' && elem.isGroup) {
-                            elem.togglePerm = function(){ 
-                                var selected = scaffold.selection.selected;
-                                utils.assert(selected); if( !selected ) return;
-                                var tag_group_id = elem.type==='tag'   ?elem['id']:selected['id'];
-                                var sen_group_id = elem.type==='sensor'?elem['id']:selected['id'];
-                                api.tags.permission[elem.permCurrent?'remove':'add'](tag_group_id,sen_group_id,function(){
-                                    load.permission.fromSelected();
-                                });
-                            }; 
-                        }
-                        if(elem.childs) addFcts(elem.childs);
-                    });
-                })(elemObj.nodes); 
-
+                addFcts(elemObj.nodes);
                 dataChangeListeners.fire();
             }); 
         }, 
         all: function(){ 
-            this.elems('sensor');
-            this.elems('tag'   );
-            this.elems('user'  );
+            load.elems('sensor');
+            load.elems('tag'   );
+            load.elems('user'  );
         } 
     }; 
 
