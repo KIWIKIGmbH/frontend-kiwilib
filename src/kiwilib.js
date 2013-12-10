@@ -76,10 +76,69 @@ window.kiwilib = (function(){
         }, 
         addDataChangeListener: function(l){dataChangeListeners.add(l)}
     }; 
+    var scaffold_element = { 
+        toggleSelect : function(){ 
+            var elem = this;
+            utils.assert(elem && elem.id && elem.type);
 
-    var scaffold_element = {
+            if(elem.type==='user' || elem.isGroup) return;//TODO
 
-    };
+            if(scaffold.selection.selected && scaffold.selection.selected!==elem) scaffold.selection.selected.isSelected=false;
+            elem.isSelected = !elem.isSelected;
+            scaffold.selection.selected = elem.isSelected?elem:undefined;
+            load.permission.fromSelected();
+        }, 
+        permission : {
+            toSelected: null,
+            change: function(target,newPerm){ 
+                var elem = this._parent;
+                utils.assert(elem && elem.id && elem.type);
+                if(elem.type==='user') return;
+
+                utils.assert(newPerm===false||newPerm===true,'wrong JS type for newPerm==='+newPerm);
+
+                var source = elem;
+                if( !source.isGroup ) source = source.groups[0];
+                utils.assert(source);
+                if( !target ) target = scaffold.selection.selected;
+                utils.assert(target);
+                if( !target.isGroup ) target = target.groups[0];
+                utils.assert(target);
+
+                utils.assert(target.type!==source.type || target.type==='user');
+                var tag_group_id = source.type==='tag'   ?source['id']:target['id'];
+                var sen_group_id = source.type==='sensor'?source['id']:target['id'];
+                api.tags.permission[newPerm?'add':'remove'](tag_group_id,sen_group_id,function(){
+                    load.permission.fromSelected();
+                });
+            } 
+        }
+    }; 
+    var scaffold_element_group  = { 
+        remove : function(){
+            var elem = this;
+            utils.assert(elem && elem.id && elem.type);
+            if( !elem.isGroup ) throw "remove(): only a group can be removed";
+            api[elem.type+'s'].groups.remove(elem.id,function(){load.all();});
+        }
+    }; 
+    var scaffold_element_sensor = { 
+         open : function(){ 
+             api.sensors.open(elem.id,function(){
+                 elem.isOpen = true;
+                 setTimeout(function(){
+                     elem.isOpen = false;
+                     dataChangeListeners.fire();
+                 },config.DOOR_OPEN_DURATION);
+             });
+         }, 
+         permission : {
+             tag : { 
+                 groups  : [],
+                 singles : []
+             } 
+         }
+    }; 
 
     var TYPES = ['user','sensor','tag'];
 
@@ -138,79 +197,46 @@ window.kiwilib = (function(){
 
             if( !api.user.isSigned() ) return;
 
-            function addFcts(arr){ 
-                arr.forEach(function(elem){
-                  //elem.permList = {};
+            function mount(elems){ 
+                function mountScaffold(elem,scaffold) { 
+                    function mountObj(elem_,prop,obj) {
+                        utils.assert(obj===null || obj.constructor===Function || obj.constructor===Object || obj.constructor===Array&&obj.length===0);
+                        if( obj===null                        ) elem_[prop] = null;
+                        else if( obj.constructor === Function ) elem_[prop] = obj;
+                        else if( obj.constructor === Object   ) elem_[prop] = elem_[prop] || {};
+                        else if( obj.constructor === Array    ) elem_[prop] = [];
+                    }
+                    for(var i in scaffold) {
+                        mountObj(elem,i,scaffold[i]);
+                        if(elem[i].constructor === Object) {
+                            elem[i]._parent = elem;
+                            for(var j in scaffold[i]) mountObj(elem[i],j,scaffold[i][j]);
+                        }
+                    }
+                } 
+                elems.forEach(function(elem){
                     utils.assert(TYPES.indexOf(elem.type)!==-1);
                     utils.assert(elem.isGroup===true || elem.isGroup===undefined);
                     utils.assert(type===elem.type,type + elem.type);
-                    if(elem.isGroup) {
-                        elem.remove = function(){ 
-                            api[type+'s'].groups.remove(elem.id,function(){load.all();});
-                        }; 
-                    }
-                    elem.toggleSelect = function(){ 
-                        if(type==='user' || elem.isGroup) return;
 
-                        if(scaffold.selection.selected && scaffold.selection.selected!==elem) scaffold.selection.selected.isSelected=false;
-                        elem.isSelected = !elem.isSelected;
-                        scaffold.selection.selected = elem.isSelected?elem:undefined;
-                        load.permission.fromSelected();
-                    }; 
-                    elem.permission = {
-                        toSelected: null,
-                        change: function(target,newPerm){ 
-                            if(elem.type==='user') return;
-
-                            utils.assert(newPerm===false||newPerm===true,'wrong JS type for newPerm==='+newPerm);
-
-                            var source = elem;
-                            if( !source.isGroup ) source = source.groups[0];
-                            utils.assert(source);
-                            if( !target ) target = scaffold.selection.selected;
-                            utils.assert(target);
-                            if( !target.isGroup ) target = target.groups[0];
-                            utils.assert(target);
-
-                            utils.assert(target.type!==source.type || target.type==='user');
-                            var tag_group_id = source.type==='tag'   ?source['id']:target['id'];
-                            var sen_group_id = source.type==='sensor'?source['id']:target['id'];
-                            api.tags.permission[newPerm?'add':'remove'](tag_group_id,sen_group_id,function(){
-                                load.permission.fromSelected();
-                            });
-                        } 
-                    };
-                    if(elem.childs) addFcts(elem.childs);
+                    /*noLint*/                                  mountScaffold(elem,scaffold_element);
+                    if( !elem.isGroup && elem.type==='sensor' ) mountScaffold(elem,scaffold_element_sensor);
+                    if(  elem.isGroup                         ) mountScaffold(elem,scaffold_element_group);
+                    if(  elem.childs                          ) mount(elem.childs);
                 });
             } 
 
             if(elemObj.singles) api[type+'s'].get(function(res){ 
                 elemObj.singles.length = 0;
                 res.forEach(function(elem){ elemObj.singles.push(elem); });
-                addFcts(elemObj.singles);
-                elemObj.singles.forEach(function(elem){
-                    if( !type==='sensor' ) return;
-                    elem.open = function(){ 
-                        api.sensors.open(elem.id,function(){
-                            elem.isOpen = true;
-                            setTimeout(function(){
-                                elem.isOpen = false;
-                                dataChangeListeners.fire();
-                            },config.DOOR_OPEN_DURATION);
-                        });
-                    }; 
-                    elem.permission.tag = { 
-                        groups  : [],
-                        singles : []
-                    }; 
-                });
+                mount(elemObj.singles);
                 if(type==='sensor') load.permission.table();
             }); 
 
             api[type+'s'].groups.get(function(res){ 
                 elemObj.nodes.length = 0;
                 res.forEach(function(elem){ elemObj.nodes.push(elem); });
-                addFcts(elemObj.nodes);
+                mount(elemObj.nodes);
             }); 
         }, 
         all: function(){ 
