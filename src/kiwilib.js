@@ -77,6 +77,10 @@ window.kiwilib = (function(){
         addDataChangeListener: function(l){dataChangeListeners.add(l)}
     }; 
 
+    var scaffold_element = {
+
+    };
+
     var TYPES = ['user','sensor','tag'];
 
     var dataChangeListeners = (function(){ 
@@ -102,7 +106,6 @@ window.kiwilib = (function(){
                             utils.assert(tag.groups,'missing groups');
                             return tag.groups.some(function(group){ return group_ids.indexOf(group.id)!==-1});
                         }).map(function(tag){return tag.id});
-                        dataChangeListeners.fire();
                     });
                 });
             }, 
@@ -124,7 +127,6 @@ window.kiwilib = (function(){
                             if( !node.isGroup ) return;
                             node.permission.toSelected = group_ids.indexOf(node['id'])!==-1?1:0;
                         });
-                        dataChangeListeners.fire();
                     });
                 }
             } 
@@ -191,7 +193,6 @@ window.kiwilib = (function(){
                     elem.open = function(){ 
                         api.sensors.open(elem.id,function(){
                             elem.isOpen = true;
-                            dataChangeListeners.fire();
                             setTimeout(function(){
                                 elem.isOpen = false;
                                 dataChangeListeners.fire();
@@ -204,14 +205,12 @@ window.kiwilib = (function(){
                     }; 
                 });
                 if(type==='sensor') load.permission.table();
-                dataChangeListeners.fire();
             }); 
 
             api[type+'s'].groups.get(function(res){ 
                 elemObj.nodes.length = 0;
                 res.forEach(function(elem){ elemObj.nodes.push(elem); });
                 addFcts(elemObj.nodes);
-                dataChangeListeners.fire();
             }); 
         }, 
         all: function(){ 

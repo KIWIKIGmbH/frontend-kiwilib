@@ -50,11 +50,6 @@ utils.module.save('endpoint', (function(){
                 var req = new XMLHttpRequest();
                 req.onreadystatechange = function(){
                     if( req.readyState===4 ) {
-                        if( endpoint._config.onAfterRequest ) {
-                            var fcts = endpoint._config.onAfterRequest;
-                            if( fcts.constructor!==Array ) fcts = [fcts];
-                            fcts.forEach(function(fct){fct()});
-                        }
                         var isError = req.status!==200;
                         var resp = req.responseText;
                         try {
@@ -63,8 +58,14 @@ utils.module.save('endpoint', (function(){
                             isError = true;
                             resp = undefined;
                         }
-                        if( isError || !resp || resp.constructor!==Object || resp['status']!=='ok' ) errHandling(req.status,req.statusText);
+                        isError = isError || !resp || resp.constructor!==Object || resp['status']!=='ok';
+                        if( isError ) errHandling(req.status,req.statusText);
                         if( param.callback ) param.callback(!isError&&resp || undefined);
+                        if( endpoint._config.onAfterRequest ) {
+                            var fcts = endpoint._config.onAfterRequest;
+                            if( fcts.constructor!==Array ) fcts = [fcts];
+                            fcts.forEach(function(fct){fct()});
+                        }
                     }
                 }
                 var url = config.ENDPOINT_ROOT+param.url;
@@ -393,6 +394,7 @@ utils.module.save('endpoint', (function(){
 
     endpoint._call   = _call;
     endpoint._config = { 
+        safeMode: true,
         isSigned:function(){
             return !!sid.get();
         }
