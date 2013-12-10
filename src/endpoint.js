@@ -1,7 +1,9 @@
-//adapts parameter&result logic of endpoints
-//-> keeps endpoint logic
+//adapts endpoints
+//<-> alters endpoints' parameters and results
+//-> keeps API logic
 //-> saves session key
 //-> maps results
+//-asserts API
 utils.module.save('endpoint', (function(){
     var config = utils.module.load('config');
 
