@@ -1,5 +1,9 @@
 /* TODO
 -more powerful obstrufacting
+-re-add karma, packages:
+    "grunt-karma": "~0.7.1",
+    "karma": "*",
+    "phantomjs": "*"
 */
 /*
 -bower not used, because;
