@@ -190,6 +190,19 @@ utils.module.save('endpoint', (function(){
         }; 
     })(); 
 
+    function map_groups(groups,elemType){
+        utils.assert(groups && groups.constructor===Array && groups.length);
+        groups = (groups || []).map(function(group){
+            group.type    = elemType;
+            group.isGroup = true;
+            group['id']   = group['group_id'];
+            delete          group['group_id'];
+            group['name'] = group['group_name'] || 'no name';
+            delete          group['group_name'];
+            return group;
+        });
+    }
+
     function generateElemGetter(elemType){ 
         var sensor_type;
         if( elemType==='sensor' ) sensor_type = {'sensor_type':'ignored'};
@@ -206,16 +219,7 @@ utils.module.save('endpoint', (function(){
                     elem['name'] = elem[elemType+'_name'] || 'no name';
                     delete         elem[elemType+'_name'];
                     elem.type    = elemType;
-                    utils.assert(elem['groups'] && elem['groups'].constructor===Array && elem['groups'].length);
-                    elem['groups'] = elem['groups'].map(function(group){
-                        group.type    = elemType;
-                        group.isGroup = true;
-                        group['id']   = group['group_id'];
-                        delete          group['group_id'];
-                        group['name'] = group['group_name'] || 'no name';
-                        delete          group['group_name'];
-                        return group;
-                    });
+                    map_groups(elem['groups'],elemType);
                     return elem;
                 }
             } 
@@ -256,20 +260,12 @@ utils.module.save('endpoint', (function(){
         users: (function(){ 
             function mapUserResult(user){ 
                 user['id']   = user['user_id'];
-                delete user['user_id'];
+                delete         user['user_id'];
                 user['name'] = user['username'];
-                delete user['username'];
-                user.type    = 'user';
-                utils.assert(user['groups']);
-                user['groups'].map(function(group){
-                    group.isGroup = true;
-                    group.type    = 'user';
-                    group['id'] = group['group_id'];
-                    delete group['group_id'];
-                    group['name'] = group['group_name'] || 'no name';
-                    delete group['group_name'];
-                    return group;
-                });
+                delete         user['username'];
+                var elemType = 'user';
+                user.type    = elemType;
+                map_groups(user['groups'],elemType);
                 return user;
             } 
             return {
