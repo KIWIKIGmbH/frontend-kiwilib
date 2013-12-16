@@ -173,6 +173,9 @@ utils.module.save('endpoint', (function(){
                           if( ret.constructor===Array  ) ret = ret.map(argsEndpoint.output.map);
                           if( ret.constructor===Object ) ret = argsEndpoint.output.map(ret);
                       }
+                      if( ret && argsEndpoint.output && argsEndpoint.output.process ) {
+                          ret = argsEndpoint.output.process(ret);
+                      }
                       //call argsEndpoint.output.call before callback, because:
                       //-on sign out the session key needs to be deleted before callback
                       if( argsEndpoint.output && argsEndpoint.output.callback ) argsEndpoint.output.callback(ret);
@@ -190,7 +193,7 @@ utils.module.save('endpoint', (function(){
         }; 
     })(); 
 
-    function map_groups(groups,elemType){
+    function map_groups(groups,elemType){ 
         utils.assert(groups && groups.constructor===Array && groups.length);
         groups = (groups || []).map(function(group){
             group.type    = elemType;
@@ -201,7 +204,19 @@ utils.module.save('endpoint', (function(){
             delete          group['group_name'];
             return group;
         });
-    }
+    } 
+    function map_elem(elem,elemType){ 
+        elem['id']   = elem[elemType+'_id'];
+        delete         elem[elemType+'_id'];
+        elem['name'] = elem[elemType+'_name'] || 'no name';
+        delete         elem[elemType+'_name'];
+        elem.type    = elemType;
+        if(elem[elemType+'_group_id']) {
+            elem['group_id'] = elem[elemType+'_group_id'];
+            delete             elem[elemType+'_group_id'];
+        }
+        return elem;
+    } 
 
     function generateElemGetter(elemType){ 
         var sensor_type;
@@ -211,16 +226,11 @@ utils.module.save('endpoint', (function(){
           //input    : { required:['sensor_type'],default:elemType==='sensor'&&{'sensor_type':'ignored'}||undefined},
             input    : { default:sensor_type },
             output   : { 
-                path: elemType+'s',
-                default:[],
-                map:function(elem){
-                    elem['id']   = elem[elemType+'_id'];
-                    delete         elem[elemType+'_id'];
-                    elem['name'] = elem[elemType+'_name'] || 'no name';
-                    delete         elem[elemType+'_name'];
-                    elem.type    = elemType;
+                path    : elemType+'s',
+                default : [],
+                map     : function(elem){
                     map_groups(elem['groups'],elemType);
-                    return elem;
+                    return map_elem(elem,elemType);
                 }
             } 
         });
@@ -317,9 +327,21 @@ utils.module.save('endpoint', (function(){
                     input    : {required:['notNeededNeither'],pathInput: 'notNeededNeither'},
                     output   : {
                         path    : targetName+'s',
-                        default : null,
+                        default : [],
                         map     : function(item){
-                            return item[targetName+'_group_id'];
+                            return map_elem(item,targetName);
+                        },
+                        process : function(res){
+                            var res2 = res.map(function(elem){
+                                return elem['group_id'];
+                            });
+                            res2 = res2.filter(function(elem,i){
+                                return res2.indexOf(elem) === i;
+                            });
+                            return {
+                                singles : res,
+                                groups  : res2
+                            };
                         }
                     }
                 });

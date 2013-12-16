@@ -160,11 +160,11 @@ window.kiwilib = (function(){
             table: function(){ 
                 utils.assert(scaffold.sensors.singles.length);
                 scaffold.sensors.singles.forEach(function(sensor){
-                    api.load.permissions.sensor(sensor.id,function(group_ids){
-                        sensor.permission.tag.groups  = group_ids;
+                    api.load.permissions(sensor,function(ret){
+                        sensor.permission.tag.groups  = ret.groups;
                         sensor.permission.tag.singles = scaffold['tags'].singles.filter(function(tag){
                             utils.assert(tag.groups,'missing groups');
-                            return tag.groups.some(function(group){ return group_ids.indexOf(group.id)!==-1});
+                            return tag.groups.some(function(group){ return ret.groups.indexOf(group.id)!==-1});
                         }).map(function(tag){return tag.id});
                     });
                 });
@@ -181,11 +181,11 @@ window.kiwilib = (function(){
                 var selected = scaffold.selection.selected;
                 if(selected) {
                     utils.assert( !selected.isGroup );
-                    api.load.permissions[selected.type](selected['id'],function(group_ids){
-                        utils.assert( group_ids && group_ids.constructor === Array);
+                    api.load.permissions(selected,function(ret){
+                        utils.assert( ret.groups && ret.groups.constructor === Array);
                         scaffold[selected.type==='sensor'?'tags':'sensors'].nodes.forEach(function(node){
                             if( !node.isGroup ) return;
-                            node.permission.toSelected = group_ids.indexOf(node['id'])!==-1?1:0;
+                            node.permission.toSelected = ret.groups.indexOf(node['id'])!==-1?1:0;
                         });
                     });
                 }
@@ -196,7 +196,7 @@ window.kiwilib = (function(){
             if(elemObj.singles) elemObj.singles.length = 0;
             elemObj.nodes.length = 0;
 
-            if( !api.user.isSigned() ) return;
+            utils.assert( api.user.isSigned() );
 
             function mount(elems){ 
                 function mountScaffold(elem,scaffold) { 
@@ -241,6 +241,11 @@ window.kiwilib = (function(){
             }); 
         }, 
         all: function(){ 
+            if( !api.user.isSigned() ) {
+                dataChangeListeners.fire();
+                return;
+            }
+
             load.elems('sensor');
             load.elems('tag'   );
             load.elems('user'  );

@@ -53,7 +53,12 @@ utils.module.save('api', (function(){
                     });
                     else do_();
                 }
-            } 
+            }, 
+            load_permissions: function(elemType){
+                return function(){
+                  elemType
+                };
+            }
         };
     })();
 
@@ -97,10 +102,13 @@ utils.module.save('api', (function(){
                 tag    : generator.load_nodes(endpoint.tags   .get   ,endpoint.groups.tag   .get),
                 user   : generator.load_nodes(endpoint.users  .getAll,endpoint.groups.user  .get)
             },
-            permissions: {
-               sensor  : endpoint.permissions.tags,
-               tag     : endpoint.permissions.sensors
-            }
+            permissions: function(elem,cb){ 
+              if( !elem.isGroup ) {
+                  var type_opposite = elem.type==='sensor'?'tag':'sensor';
+                  endpoint.permissions[type_opposite+'s'](elem.id,cb);
+              }
+              else throw 'GET permission from groups not implemented yet';
+            } 
         }, 
         alter: { 
             group: {
