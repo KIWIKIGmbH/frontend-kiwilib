@@ -3,6 +3,8 @@ window.kiwilib = (function(){
     var api    = utils.module.load('api');
     var config = utils.module.load('config');
 
+    var sensor_order;
+
     var scaffold = { 
         user      : { 
             session: { 
@@ -42,21 +44,26 @@ window.kiwilib = (function(){
             singles    : [],
             nodes      : [],
             addGroup   : function(name){
-             api.alter.group.add.sensor(name,function(){load.all()});
-           }
+                api.alter.group.add.sensor(name,function(){load.all()});
+            },
+            setOrder   : function(orderObj){
+                utils.assert(orderObj['coordinates']);
+                sensor_order = orderObj;
+                load.elems('sensor');
+            }
         }, 
         tags      : { 
             singles    : [],
             nodes      : [],
             addGroup   : function(name){
-             api.alter.group.add.tag  (name,function(){load.all()});
-           }
+                api.alter.group.add.tag  (name,function(){load.all()});
+            }
         }, 
         users     : { 
             nodes      : [],
             addGroup   : function(name){
-             api.alter.group.add.user (name,function(){load.all()});
-           }
+                api.alter.group.add.user (name,function(){load.all()});
+            }
         }, 
         selection : { 
             selected: null
@@ -230,6 +237,28 @@ window.kiwilib = (function(){
             if(elemObj.singles) api.load.singles[type](function(res){ 
                 elemObj.singles.length = 0;
                 res.forEach(function(elem){ elemObj.singles.push(elem); });
+                if( type==='sensor' && sensor_order ) elemObj.singles.sort(function(l,r) { 
+                    var no_missing_data =
+                        sensor_order['coordinates'] &&
+                        sensor_order['coordinates']['latitude'] &&
+                        sensor_order['coordinates']['longitude'] &&
+                        l['geo']['lat'] &&
+                        l['geo']['lng'] &&
+                        r['geo']['lat'] &&
+                        r['geo']['lng'];
+                    utils.assert(no_missing_data,'geolocation data missing');
+                    if( !no_missing_data ) return 0;
+                    function get_distance(sensor) {
+                        return Math.sqrt(
+                            Math.pow(sensor['geo']['lat'] - sensor_order['coordinates']['latitude'] ,2) +
+                            Math.pow(sensor['geo']['lng'] - sensor_order['coordinates']['longitude'],2)
+                        );
+                    }
+                    var ld = get_distance(l);
+                    var rd = get_distance(r);
+                    if( ld === rd ) return 0;
+                    return ld > rd ? -1 : 1;
+                }); 
                 mount(elemObj.singles);
                 if(type==='sensor') load.permission.table();
             }); 

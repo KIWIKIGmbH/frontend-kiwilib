@@ -48,43 +48,29 @@ utils.module.save('endpoint', (function(){
                 param.data['page_size']   = param.data['page_size']   || 999999;
             }
             if( endpoint._config.onBeforeRequest ) endpoint._config.onBeforeRequest();
-            (function(){ 
-                var req = new XMLHttpRequest();
-                req.onreadystatechange = function(){
-                    if( req.readyState===4 ) {
-                        var isError = req.status!==200;
-                        var resp = req.responseText;
-                        try {
-                           resp = JSON.parse(resp);
-                        }catch(e){
-                            isError = true;
-                            resp = undefined;
-                        }
-                        isError = isError || !resp || resp.constructor!==Object || resp['status']!=='ok';
-                        if( isError ) errHandling(req.status,req.statusText);
-                        if( param.callback ) param.callback(!isError&&resp || undefined);
-                        if( endpoint._config.onAfterRequest ) {
-                            var fcts = endpoint._config.onAfterRequest;
-                            if( fcts.constructor!==Array ) fcts = [fcts];
-                            fcts.forEach(function(fct){fct()});
-                        }
-                    }
+
+            utils.req(
+                param.method,
+                config.ENDPOINT_ROOT+param.url,
+                param.data,
+                function(resp,req){
+                      var isError = req.status!==200;
+                      try {
+                         resp = JSON.parse(resp);
+                      }catch(e){
+                          isError = true;
+                          resp = undefined;
+                      }
+                      isError = isError || !resp || resp.constructor!==Object || resp['status']!=='ok';
+                      if( isError ) errHandling(req.status,req.statusText);
+                      if( param.callback ) param.callback(!isError&&resp || undefined);
+                      if( endpoint._config.onAfterRequest ) {
+                          var fcts = endpoint._config.onAfterRequest;
+                          if( fcts.constructor!==Array ) fcts = [fcts];
+                          fcts.forEach(function(fct){fct()});
+                      }
                 }
-                var url = config.ENDPOINT_ROOT+param.url;
-                if(param.method==='GET' && param.data) {
-                    url += '?'+Object.keys(param.data).map(function(key){return key+'='+window.encodeURIComponent(param.data[key])}).join('&');
-                }
-                req.open(param.method,url,true);
-                req.setRequestHeader('Content-Type'    ,'application/json; charset=utf-8');
-                req.setRequestHeader('Accept'          ,'application/json, text/javascript, */*; q=0.01');
-                req.setRequestHeader('X-Requested-With','XMLHttpRequest');
-                if(param.method==='GET') {
-                    req.send();
-                    return;
-                }
-                utils.assert(param.data);
-                req.send(param.data);
-            })(); 
+            );
         } 
         _call = apiReq;
 
