@@ -124,14 +124,14 @@ var log = (function(DOM){
         ['groups/user/remove'           ,['{{savedData.newGroupUser.id}}'  ],null],
         ['groups/sensor/remove'         ,['{{savedData.newGroupSensor.id}}'],null],
         ['groups/tag/remove'            ,['{{savedData.newGroupTag.id}}'   ],null],
-        ['permissions/tags'             ,['{{savedData.sensors.1.id}}'],   'tag_groups_wperm'],
-        ['permissions/sensors'          ,['{{savedData.tags.0.id}}'   ],'sensor_groups_wperm'],
+        ['permissions/tags'             ,['{{savedData.sensors.1.id}}'],   'tag_wperm'],
+        ['permissions/sensors'          ,['{{savedData.tags.0.id}}'   ],'sensor_wperm'],
         ['permissions/remove'           ,['{{savedData.tag_groups.0.id}}','{{savedData.sensor_groups.0.id}}'],null],
-        ['permissions/post'             ,['{{savedData.tag_groups.0.id}}','{{savedData.sensor_groups.0.id}}'],null],
-        ['permissions/remove'           ,['{{savedData.tag_groups_wperm.3}}','{{savedData.sensor_groups_wperm.3}}'],null],
-        ['permissions/post'             ,['{{savedData.tag_groups_wperm.3}}','{{savedData.sensor_groups_wperm.3}}'],null],
-        ['permissions/remove'           ,[269,21],null],
-        ['permissions/post'             ,[269,21],null]
+        ['permissions/post'             ,['{{savedData.tag_groups.0.id}}','{{savedData.sensor_groups.0.id}}'],null]
+      //['permissions/remove'           ,['{{savedData.tag_wperm.groups.3}}','{{savedData.sensor_wperm.groups.3}}'],null],
+      //['permissions/post'             ,['{{savedData.tag_wperm.groups.3}}','{{savedData.sensor_wperm.groups.3}}'],null],
+      //['permissions/remove'           ,[269,21],null],
+      //['permissions/post'             ,[269,21],null]
     ]; 
 
     var exhautive = calls.concat([ 
@@ -153,6 +153,8 @@ var log = (function(DOM){
     var savedData;
     function doCalls(calls_,i){ 
         if(i===0) savedData = {};
+        window.savedData = savedData;
+        console.log(calls_.length,i);
         if( i>=calls_.length ) {
             callback();
             return;
@@ -183,7 +185,6 @@ var log = (function(DOM){
                 if( !val ) {
                     var errMsg = "ERR; missing " + prop + " in savedData."+path;
                     utils.assert(false,errMsg);
-                    throw errMsg;
                 }
             });
             if( /^{{.*}}$/.test(data) ) return val;
@@ -207,70 +208,70 @@ var log = (function(DOM){
 
     doCalls(exhautive,0);
 
-    function checkCoverage(){ 
-
-        var endpoints = [];
-        //check coverage of test calls
-        (function checkEndpointObj(endpoints_,path){ 
-            utils.assert(endpoints_.constructor===Object);
-            for(var i in endpoints_) {
-                if( i[0]!=='_' ) {
-                    var newPath = path+'.'+i;
-                    if ( endpoints_[i].constructor===Function ) {
-                        endpoints.push(endpoints_[i]);
-                        if ( !endpoints_[i].status ) log.missing('test endpoint'+newPath);
-                    }
-                    else checkEndpointObj(endpoints_[i],newPath);
-                }
-            }
-        })(endpoint,''); 
-
-        //check coverage of endpoint object
-        endpoint._call({ 
-            url: '/management/',
-            method: 'GET',
-            noPaging: true,
-            callback: function(resp){
-                var endpoints_backend = resp['result']['routes'].filter(function(route){
-                    if(/\/management\/$/.test(route['url'])) return false;
-                    var dir = route['url'].match(/^\/(.*?)(?=\/)/)[1];
-                    if( dir==='static' ) return false;
-                    if( dir==='demo'   ) return false;
-                    utils.assert(dir==='pre');
-                    return true;
-                }).map(function(route){
-                    return route['methods'].filter(function(m){
-                        return ['GET','POST','DELETE'].indexOf(m)!==-1;
-                    }).map(function(m){
-                        var url = route['url'].replace(/^\/.*?(?=\/)/,'').replace(/<.*?>/g,'%');
-                        url = url.replace('act/%','act/open');
-                        return m + ' ' + url;
-                    });
-                }).reduce(function(l,r){return l.concat(r)})
-                  .filter(function(end){
-                    if(/^POST \/[0-9]\/$/.test(end)) return false;
-                    return true;
-                  });
-                var endpoints_frontend = endpoints.map(function(end){
-                    return end.backend.method + ' ' + end.backend.url;
-                });
-                endpoints_backend
-                    .concat(endpoints_frontend)
-                    .sort()
-                    .map(function(end){
-                        if( endpoints_backend .indexOf(end)>-1 &&
-                            endpoints_frontend.indexOf(end)>-1 ) return 1;
-                        if( endpoints_backend .indexOf(end)>-1 ) return 'endpoint Obj missing '+end;
-                        if( endpoints_frontend.indexOf(end)>-1 ) return '/management/ missing '+end;
-                        utils.assert(false);
-                    })
-                    .filter(function(end){return end!==1})
-                    .forEach(log.missing);
-                log.endpoints(endpoints_backend.sort().join('<br>'));
-            }
-        }); 
-    }; 
     function callback(){ 
+        function checkCoverage(){ 
+
+            var endpoints = [];
+            //check coverage of test calls
+            (function checkEndpointObj(endpoints_,path){ 
+                utils.assert(endpoints_.constructor===Object);
+                for(var i in endpoints_) {
+                    if( i[0]!=='_' ) {
+                        var newPath = path+'.'+i;
+                        if ( endpoints_[i].constructor===Function ) {
+                            endpoints.push(endpoints_[i]);
+                            if ( !endpoints_[i].status ) log.missing('test endpoint'+newPath);
+                        }
+                        else checkEndpointObj(endpoints_[i],newPath);
+                    }
+                }
+            })(endpoint,''); 
+
+            //check coverage of endpoint object
+            endpoint._call({ 
+                url: '/management/',
+                method: 'GET',
+                noPaging: true,
+                callback: function(resp){
+                    var endpoints_backend = resp['result']['routes'].filter(function(route){
+                        if(/\/management\/$/.test(route['url'])) return false;
+                        var dir = route['url'].match(/^\/(.*?)(?=\/)/)[1];
+                        if( dir==='static' ) return false;
+                        if( dir==='demo'   ) return false;
+                        utils.assert(dir==='pre');
+                        return true;
+                    }).map(function(route){
+                        return route['methods'].filter(function(m){
+                            return ['GET','POST','DELETE'].indexOf(m)!==-1;
+                        }).map(function(m){
+                            var url = route['url'].replace(/^\/.*?(?=\/)/,'').replace(/<.*?>/g,'%');
+                            url = url.replace('act/%','act/open');
+                            return m + ' ' + url;
+                        });
+                    }).reduce(function(l,r){return l.concat(r)})
+                      .filter(function(end){
+                        if(/^POST \/[0-9]\/$/.test(end)) return false;
+                        return true;
+                      });
+                    var endpoints_frontend = endpoints.map(function(end){
+                        return end.backend.method + ' ' + end.backend.url;
+                    });
+                    endpoints_backend
+                        .concat(endpoints_frontend)
+                        .sort()
+                        .map(function(end){
+                            if( endpoints_backend .indexOf(end)>-1 &&
+                                endpoints_frontend.indexOf(end)>-1 ) return 1;
+                            if( endpoints_backend .indexOf(end)>-1 ) return 'endpoint Obj missing '+end;
+                            if( endpoints_frontend.indexOf(end)>-1 ) return '/management/ missing '+end;
+                            utils.assert(false);
+                        })
+                        .filter(function(end){return end!==1})
+                        .forEach(log.missing);
+                    log.endpoints(endpoints_backend.sort().join('<br>'));
+                }
+            }); 
+        } 
         checkCoverage();
     }; 
 

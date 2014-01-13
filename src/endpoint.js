@@ -130,7 +130,7 @@ utils.module.save('endpoint', (function(){
                         inputData[key] = val;
                     }
                     if( !inputData[key] ) {
-                        var errMsg = 'missing argument ' + key;
+                        var errMsg = 'missing argument ' + key +' for call to '+argsEndpoint.endpoint.method + ' ' + argsEndpoint.endpoint.path;
                         utils.assert(false,errMsg);
                         throw errMsg;
                     }
@@ -152,6 +152,7 @@ utils.module.save('endpoint', (function(){
                       var ret = resp;
                       if( argsEndpoint.output ) {
                           if( !argsEndpoint.output.path ) argsEndpoint.output.path = '';
+                          utils.assert( ret && ret['result'], 'no results from ' + path );
                           ret = processResult(ret,argsEndpoint.output.path,argsEndpoint.output.default);
                       }
                       if( ret && argsEndpoint.output && argsEndpoint.output.map ) {
