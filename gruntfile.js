@@ -1,11 +1,8 @@
-/* TODO
--more powerful obstrufacting
--re-add karma, packages:
-    "grunt-karma": "~0.7.1",
-    "karma": "*",
-    "phantomjs": "*"
-*/
 /*
+===TODO
+-more powerful obstrufacting
+
+===Building decisions
 -bower not used, because;
   -retrieves whole repository instead of single min.js
 -requirejs not used, because;
@@ -22,7 +19,7 @@ module.exports = function(grunt) {
 
     var BANNER = '/*\n KIWI.KI library v<%= pkg.version%>\n (c) 2013-2014 KIWI.KI GmbH, http://kiwi.ki\n License: MIT\n*/\n"use strict";';
 
-    var JS_FILES_TO_LINT = ['*.js','src/*.js','test/*.js','test/endpoint/*.js','/test/kiwilib/*.js','test/karma/*.js'];
+    var JS_FILES_TO_LINT = ['*.js','src/*.js'];
 
     var GLOBALS = [ 
         '$',
@@ -126,11 +123,6 @@ module.exports = function(grunt) {
                 src: JS_FILES_TO_LINT
             }
         }, 
-        karma: { 
-            unit: {
-                configFile: 'test/karma/karma.conf.js'
-            }
-        }, 
         uglify: { 
             options: {
                 mangle: false
@@ -161,7 +153,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-dom-munger');
     grunt.loadNpmTasks('grunt-jslint');
-    grunt.loadNpmTasks('grunt-karma');
 
     grunt.registerTask('build',[
         'clean:all',
@@ -177,5 +168,4 @@ module.exports = function(grunt) {
         'jshint'
     ]);
     grunt.registerTask('default',['lint','build']);
-    grunt.registerTask('test',['karma']);
 };
