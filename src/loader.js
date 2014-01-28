@@ -4,7 +4,7 @@
     if( location.hostname==='localhost' && location.port==='1337' ) {
         var origin = 'http://localhost:8000';
         SCRIPTS.forEach(function(js){
-          loadScript( origin + '/src/' + js );
+          loadScript( origin + '/' + js );
         });
     }
     else {
