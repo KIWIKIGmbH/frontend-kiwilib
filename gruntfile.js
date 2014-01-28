@@ -15,7 +15,7 @@ module.exports = function(grunt) {
     var TARGET_KIWILIB = TARGET+'<%= pkg.version %>/all.min.js';
     var TARGET_LOADER  = TARGET+'kiwilib.js';
 
-    var JS_ORDER_HTML = 'test/kiwilib/index.html';
+    var JS_ORDER_HTML = 'js-order.html';
 
     var BANNER = '/*\n KIWI.KI library v<%= pkg.version%>\n (c) 2013-2014 KIWI.KI GmbH, http://kiwi.ki\n License: MIT\n*/\n"use strict";';
 
