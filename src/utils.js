@@ -1,3 +1,6 @@
+//some helper functions
+//-this code is self existent, i.e. does not depend on any other code
+//-this code does not extend neither populate any built-in objects
 var utils = {
     assert: (function(){ 
         function ret(assertion){
@@ -25,6 +28,7 @@ var utils = {
         return ret;
     })(), 
     exception: function(){ 
+        //this is supose to become an exception thrower. It is not implemented yet.
         this.assert.call(arguments);
     }, 
     module: (function(){ 

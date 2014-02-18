@@ -1,12 +1,12 @@
 /*
 ===TODO
--more powerful obstrufacting
+-more powerful JS minifying, e.g. closure compiler
 
 ===Building decisions
--bower not used, because;
+-Bower not used, because;
   -retrieves whole repository instead of single min.js
--requirejs not used, because;
-  -code need to be added to lib files
+-RequireJS not used, because;
+  -code required to be added to lib files
 */
 module.exports = function(grunt) {
     var SOURCE_KIWILIB = 'src/';
