@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 
     var JS_ORDER_HTML = 'js-order.html';
 
-    var BANNER = '/*\n KIWI.KI library v<%= pkg.version%>\n (c) 2013-2014 KIWI.KI GmbH, http://kiwi.ki\n License: MIT\n*/\n"use strict";';
+    var BANNER = '/*\n KIWI.KI library v<%= pkg.version%>\n (c) 2013-2014 KIWI.KI GmbH, http://kiwi.ki\n License: MPL\n*/\n"use strict";';
 
     var JS_FILES_TO_LINT = ['*.js','src/*.js'];
 
