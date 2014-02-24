@@ -2,8 +2,8 @@
     var SCRIPTS = ['utils.js','config.js','endpoint.js','api.js','kiwilib.js'];
     function loadScript(url){ document.write('<script src="'+url+'"></script>'); }
     var port = parseInt(location.port,10);
-    if( location.hostname==='localhost' && port>1330 && port<1339 ) {
-        var origin = 'http://localhost:8000';
+    if( (location.hostname==='localhost' || location.hostname.indexOf("10.9.") === 0) && port>1330 && port<1339 ) {
+        var origin = 'http://' + location.hostname +':8000';
         SCRIPTS.forEach(function(js){
           loadScript( origin + '/' + js );
         });
