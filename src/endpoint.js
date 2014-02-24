@@ -396,6 +396,23 @@ utils.module.save('endpoint', (function(){
                 };
             });
             return ret;
+        })(), 
+        friendly_names:(function(){ 
+            var ret = {};
+            ['tag','sensor','user','gateway'].forEach(function(elemType){
+                ret[elemType] = {
+                    set: generateEndpointFct({ 
+                        endpoint: { method: 'POST', path: '/private/fnames/'+elemType+'/%' },
+                        input   : { required: ['user_id','imLocalYo','friendly_name'],pathInput: 'imLocalYo' }
+                    }), 
+                    get: generateEndpointFct({ 
+                        endpoint: { method: 'GET', path: '/private/fnames/'+elemType+'/%' },
+                        input   : { required: ['user_id','imLocalYo'],pathInput: 'imLocalYo' },
+                        output  : { path: 'user/fname' }
+                    }), 
+                }
+            });
+            return ret;
         })() 
     }; 
 

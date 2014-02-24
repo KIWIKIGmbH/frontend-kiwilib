@@ -121,6 +121,16 @@ window.kiwilib = (function(){
             } 
         }
     }; 
+    var scaffold_element_single = { 
+        rename: function(new_val){ 
+            var elem = this;
+            utils.assert(elem && elem.id && elem.type);
+
+            api.alter.friendly_names[elem.type](elem.id,new_val,function(){
+                load.all();
+            });
+        } 
+    }; 
     var scaffold_element_group  = { 
         remove : function(){
             var elem = this;
@@ -232,6 +242,7 @@ window.kiwilib = (function(){
                     /*noLint*/                                  mountScaffold(elem,scaffold_element);
                     if( !elem.isGroup && elem.type==='sensor' ) mountScaffold(elem,scaffold_element_sensor);
                     if(  elem.isGroup                         ) mountScaffold(elem,scaffold_element_group);
+                    if( !elem.isGroup                         ) mountScaffold(elem,scaffold_element_single);
                     if(  elem.childs                          ) mount(elem.childs);
                 });
             } 
@@ -263,6 +274,14 @@ window.kiwilib = (function(){
                 }); 
                 mount(elemObj.singles);
                 if(type==='sensor') load.permission.table();
+                /* subsequent requests get 405. That's ok because friendly name is set as name when server gives us singles
+                elemObj.singles.forEach(function(single){
+                    api.load.friendly_names[single.type](single.id,function(name){
+                        single.name = name;
+                        console.log(single);
+                    });
+                });
+                */
             }); 
 
             api.load.groups[type](function(res){ 

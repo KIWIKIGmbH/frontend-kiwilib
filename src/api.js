@@ -4,7 +4,21 @@ utils.module.save('api', (function(){
     var endpoint = utils.module.load('endpoint');
 
     var generator = (function(){
-        var userGroupId;
+        var get_current_user_information = (function(){ 
+            //known caveat that may turn into bug; after signing out `var current_user` is still going to hold signout user information
+            var current_user;
+            return function(callback){
+                if( current_user ) {
+                    callback(current_user);
+                }
+                else {
+                    endpoint.users.getMyself(function(user){
+                        current_user = user;
+                        callback(current_user);
+                    });
+                }
+            }
+        })(); 
         return {
             load_nodes: function(endpoint_leaf,endpoint_node){ 
                 return function(callback){
@@ -45,20 +59,22 @@ utils.module.save('api', (function(){
                 }
             }, 
             alter_group_add: function(endpoint_add){ 
-                return function (arg,callback){
-                    function do_(){ endpoint_add(arg,userGroupId,callback) }
-                    if(!userGroupId) endpoint.users.getMyself(function(ret){
-                        userGroupId = ret.groups[0].id;
-                        do_();
+                //add to argument list a group id the current user belongs to
+                return function (group_name,callback){
+                    get_current_user_information(function(user){
+                        endpoint_add(group_name,user.groups[0].id,callback);
                     });
-                    else do_();
                 }
             }, 
-            load_permissions: function(elemType){
+            friendly_names: function(elem_type,endpoint_name){ 
+                //prepend user_id to argument list
                 return function(){
-                  elemType
+                    var args = [].slice.call(arguments);
+                    get_current_user_information(function(user){
+                        endpoint.friendly_names[elem_type][endpoint_name].apply(null,[user.id].concat(args))
+                    });
                 };
-            }
+            } 
         };
     })();
 
@@ -108,7 +124,14 @@ utils.module.save('api', (function(){
                   endpoint.permissions[type_opposite+'s'](elem.id,cb);
               }
               else throw 'GET permission from groups not implemented yet';
-            } 
+            }, 
+            friendly_names : (function(){ 
+                var ret = {};
+                ['user','sensor','tag','gateway'].forEach(function(elem_type){
+                    ret[elem_type] = generator.friendly_names(elem_type,'get');
+                });
+                return ret;
+            })() 
         }, 
         alter: { 
             group: {
@@ -131,7 +154,14 @@ utils.module.save('api', (function(){
                 add_sensor : endpoint.manufacturing.sensor,
                 add_tag    : endpoint.manufacturing.tag
             },
-            open : endpoint.sensors.open
+            open : endpoint.sensors.open,
+            friendly_names : (function(){ 
+                var ret = {};
+                ['user','sensor','tag','gateway'].forEach(function(elem_type){
+                    ret[elem_type] = generator.friendly_names(elem_type,'set');
+                });
+                return ret;
+            })() 
         } 
     };
 
