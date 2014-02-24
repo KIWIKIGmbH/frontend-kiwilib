@@ -238,7 +238,7 @@ utils.module.save('endpoint', (function(){
             signin     : generateEndpointFct({
                 endpoint : { method: 'POST'  , path: '/session/'           },
                 input    : { required:['username','password'], noSessionKey:true },
-                output   : { path: 'session/session_key', callback: function(sid_){sid.set(sid_)} }
+                output   : { path: 'session/session_key', callback: function(sid_){if(sid_) sid.set(sid_); else sid.del()} }
             }),
             signout    : generateEndpointFct({
                 //utils.assert(sid.get(),'signout while being already signed out');

@@ -44,9 +44,17 @@ var utils = {
         }
     })(), 
     storage: { 
-        get: function get(key)     { return localStorage[key]; },
-        set: function set(key,val) { localStorage[key]=val;    },
-        del: function del(key)     { if(!key) localStorage.clear(); else delete localStorage[key] }
+        get: function get(key) {
+            return localStorage[key];
+        },
+        set: function set(key,val) {
+            if(val===undefined || val===null || val.constructor!==String) throw 'string expected';
+            localStorage[key]=val;
+        },
+        del: function del(key) {
+            if(!key) localStorage.clear();
+            else delete localStorage[key];
+        }
     }, 
     req: function(method,url,data,onSuccess){ 
         var req = new XMLHttpRequest();
