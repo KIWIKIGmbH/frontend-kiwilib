@@ -129,7 +129,8 @@ window.kiwilib = (function(){
         }
     }; 
     var scaffold_element_sensor = { 
-        open : function(){ 
+        open : function(argsObj){ 
+            argsObj = argsObj || {};
             var elem = this;
             utils.assert(elem && elem.id && elem.type);
             api.alter.open(elem.id,function(){
@@ -138,7 +139,8 @@ window.kiwilib = (function(){
                     elem.isOpen = false;
                     dataChangeListeners.fire();
                 },config.DOOR_OPEN_DURATION);
-            });
+                if( argsObj.onSuccess ) argsObj.onSuccess.apply(elem,arguments);
+            },argsObj.onError);
         }, 
         permission : {
             tag : { 
