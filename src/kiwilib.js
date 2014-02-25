@@ -128,7 +128,6 @@ window.kiwilib = (function(){
             utils.assert(elem && elem.id && elem.type);
 
             api.alter.friendly_names[elem.type](elem.id,new_val,function(){
-                load.all();
                 if( argsObj.onSuccess ) argsObj.onSuccess.apply(elem,arguments);
             },argsObj.onError);
         } 
