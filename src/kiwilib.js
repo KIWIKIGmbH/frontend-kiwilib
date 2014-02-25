@@ -122,13 +122,15 @@ window.kiwilib = (function(){
         }
     }; 
     var scaffold_element_single = { 
-        rename: function(new_val){ 
+        rename: function(new_val, argsObj){ 
+            argsObj = argsObj || {};
             var elem = this;
             utils.assert(elem && elem.id && elem.type);
 
             api.alter.friendly_names[elem.type](elem.id,new_val,function(){
                 load.all();
-            });
+                if( argsObj.onSuccess ) argsObj.onSuccess.apply(elem,arguments);
+            },argsObj.onError);
         } 
     }; 
     var scaffold_element_group  = { 
