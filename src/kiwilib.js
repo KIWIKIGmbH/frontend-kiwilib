@@ -128,8 +128,8 @@ window.kiwilib = (function(){
             utils.assert(elem && elem.id && elem.type);
 
             api.alter.friendly_names[elem.type](elem.id,new_val,function(){
-                if( argsObj.onSuccess ) argsObj.onSuccess.apply(elem,arguments);
-            },argsObj.onError);
+                if( argsObj.callback ) argsObj.callback.apply(elem,arguments);
+            },argsObj.onError,argsObj.onSuccess);
         } 
     }; 
     var scaffold_element_group  = { 
@@ -145,13 +145,17 @@ window.kiwilib = (function(){
             var elem = this;
             utils.assert(elem && elem.id && elem.type);
             api.alter.open(elem.id,function(){
+                //since function is set as callback.
+                //But it should be set as onSuccess attribute.
+                //In essence we are lying about the Success of opening doors
+                //We lie because for now there are no ways to check if the door is actually open or not
                 elem.isOpen = true;
                 setTimeout(function(){
                     elem.isOpen = false;
                     dataChangeListeners.fire();
                 },config.DOOR_OPEN_DURATION);
-                if( argsObj.onSuccess ) argsObj.onSuccess.apply(elem,arguments);
-            },argsObj.onError);
+                if( argsObj.callback ) argsObj.callback.apply(null,arguments);
+            },argsObj.onError,argsObj.onSuccess);
         }, 
         permission : {
             tag : { 

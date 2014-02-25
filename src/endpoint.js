@@ -63,7 +63,9 @@ utils.module.save('endpoint', (function(){
                       }
                       isError = isError || !resp || resp.constructor!==Object || resp['status']!=='ok';
                       if( isError ) errHandling(req.status,req.statusText);
-                      if( param.callback ) param.callback(!isError&&resp || undefined);
+                      var callback_return_val = !isError&&resp || undefined;
+                      if( !isError ) if( param.onSuccess ) param.onSuccess( callback_return_val );
+                      if( param.callback ) param.callback( callback_return_val );
                       if( endpoint._config.onAfterRequest ) {
                           var fcts = endpoint._config.onAfterRequest;
                           if( fcts.constructor!==Array ) fcts = [fcts];
@@ -168,7 +170,8 @@ utils.module.save('endpoint', (function(){
                       if( argsEndpoint.output && argsEndpoint.output.callback ) argsEndpoint.output.callback(ret);
                       if( argsCall[inputLength] ) argsCall[inputLength](ret);
                     },
-                    onError: argsCall[inputLength+1]
+                    onError: argsCall[inputLength+1],
+                    onSuccess: argsCall[inputLength+2]
                 });
                 if( argsEndpoint.input && argsEndpoint.input.fctToCall ) argsEndpoint.input.fctToCall();
             }; 

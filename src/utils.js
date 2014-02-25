@@ -56,10 +56,10 @@ var utils = {
             else delete localStorage[key];
         }
     }, 
-    req: function(method,url,data,onSuccess){ 
+    req: function(method,url,data,callback){ 
         var req = new XMLHttpRequest();
         req.onreadystatechange = function(){
-            if( req.readyState===4 ) onSuccess && onSuccess(req.responseText,req);
+            if( req.readyState===4 ) callback && callback(req.responseText,req);
         };
         if(method==='GET' && data) {
             url += '?'+Object.keys(data).map(function(key){return key+'='+window.encodeURIComponent(data[key])}).join('&');
