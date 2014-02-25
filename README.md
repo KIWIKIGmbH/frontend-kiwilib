@@ -12,11 +12,9 @@ The Backend API root that the KiwiLib talks to is `egrep "^\s*ENDPOINT_ROOT = '(
 
 
 
-[comment]: <> (this should be a comment and only visible in the source, github supports this trick and gitlab doesn't)
-[comment]: <> (TOC works on github but not on gilab; github generates href links where gitlab doesn't)
 **Table of Conent**
 - [Code Explained](#code-explained)
-- [Building & Serving](#building-serving)
+- [Building and Serving](#building-and-serving)
 - [Usage](#usage)
 - [Git Remote Path Convention](#git-remote-path-convention)
 - [License](#license)
@@ -94,7 +92,7 @@ You can run `src$ fgrep window.utils.module.load * -R` to see the module depende
 
 
 
-## Building & Serving
+## Building and Serving
 
 
 ### Build the code
@@ -158,8 +156,6 @@ Only `window.kiwilib` should be used.
 
 
 A usage documentation for `window.kiwilib` is not written yet and has to be written.
-
-[comment]: <> (That said, a good start to see how to use `window.kiwilib` object, have a look at the minimalistic AngularJS view implementation that makes use of the KiwiLib at `https://github.com/KIWIKIGMBH/frontend-app-web`)
 
 
 
