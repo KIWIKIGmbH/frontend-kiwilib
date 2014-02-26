@@ -152,7 +152,8 @@ utils.module.save('api', (function(){
             },
             system: {
                 add_sensor : endpoint.manufacturing.sensor,
-                add_tag    : endpoint.manufacturing.tag
+                add_tag    : endpoint.manufacturing.tag,
+                claim_tag  : endpoint.tags.claim
             },
             open : endpoint.sensors.open,
             friendly_names : (function(){ 

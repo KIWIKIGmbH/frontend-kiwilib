@@ -57,6 +57,9 @@ window.kiwilib = (function(){
             nodes      : [],
             addGroup   : function(name){
                 api.alter.group.add.tag  (name,function(){load.all()});
+            },
+            claim      : function(id, key) {
+                api.alter.system.claim_tag(id, 1, key, function() {load.all(); });
             }
         }, 
         users     : { 
