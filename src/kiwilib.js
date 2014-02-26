@@ -58,8 +58,11 @@ window.kiwilib = (function(){
             addGroup   : function(name){
                 api.alter.group.add.tag  (name,function(){load.all()});
             },
-            claim      : function(id, key) {
-                api.alter.system.claim_tag(id, 1, key, function() {load.all(); });
+            claim      : function(id, key, argsObj) {
+                argsObj = argsObj || {};
+                api.alter.system.claim_tag(id, 1, key,function(){
+                    if( argsObj.callback ) argsObj.callback.apply(elem,arguments);
+                },argsObj.onError,argsObj.onSuccess);
             }
         }, 
         users     : { 
