@@ -99,7 +99,7 @@ You can run `src$ fgrep window.utils.module.load * -R` to see the module depende
 
 Install Grunt CLI (task runner)
 
-    $ apt-get install nodejs npm
+    # apt-get install nodejs npm
     $ npm install -g grunt-cli
 
 Install required grunt plugins listed in kiwilib/package.json
@@ -107,6 +107,10 @@ Install required grunt plugins listed in kiwilib/package.json
     $ cd kiwilib
     kiwilib$ npm install
 
+You may need to symlink nodejs to node...
+
+    # ln -s /usr/bin/nodejs /usr/bin/node
+    
 Finally build the code
 
     kiwilib$ grunt build
