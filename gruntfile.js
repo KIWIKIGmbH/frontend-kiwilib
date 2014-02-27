@@ -12,12 +12,13 @@ module.exports = function(grunt) {
     var SOURCE_KIWILIB = 'src/';
 
     var TARGET = 'build/';
-    var TARGET_KIWILIB = TARGET+'<%= pkg.version %>/all.min.js';
+    var TARGET_VER = TARGET+'<%= pkg.version %>/';
+    var TARGET_KIWILIB = TARGET_VER + 'all.min.js';
     var TARGET_LOADER  = TARGET+'kiwilib.js';
 
     var JS_ORDER_HTML = 'js-order.html';
 
-    var BANNER = '/*\n KIWI.KI library v<%= pkg.version%>\n (c) 2013-2014 KIWI.KI GmbH, http://kiwi.ki\n License: MPL\n*/\n"use strict";';
+    var BANNER = '/*\n KIWI.KI library v<%= pkg.version%>\n (c) 2013-2014 KIWI.KI GmbH, http://kiwi.ki\n License: MPLV2\n*/\n"use strict";';
 
     var JS_FILES_TO_LINT = ['*.js','src/*.js'];
 
@@ -63,7 +64,13 @@ module.exports = function(grunt) {
                 src: [TARGET_LOADER],
                 dest: TARGET_LOADER
             }
-        }, 
+        },
+        copy: {
+            main: {
+              src: SOURCE_KIWILIB + '*',
+              dest: TARGET_VER,
+            },
+        },
         clean: { 
             all: [TARGET]
         }, 
@@ -151,6 +158,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-dom-munger');
     grunt.loadNpmTasks('grunt-jslint');
 
@@ -168,4 +176,5 @@ module.exports = function(grunt) {
         'jshint'
     ]);
     grunt.registerTask('default',['lint','build']);
+    grunt.registerTask('debug',['lint','build','copy']);
 };
