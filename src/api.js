@@ -72,9 +72,7 @@ utils.module.save('api', (function(){
                 //prepend user_id to argument list
                 return function(){
                     var args = [].slice.call(arguments);
-                    get_current_user_information(function(user){
-                        endpoint.friendly_names[elem_type][endpoint_name].apply(null,[user.id].concat(args))
-                    });
+                    endpoint.friendly_names[elem_type][endpoint_name].apply(null, args);
                 };
             } 
         };

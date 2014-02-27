@@ -407,12 +407,12 @@ utils.module.save('endpoint', (function(){
             ['tag','sensor','user','gateway'].forEach(function(elemType){
                 ret[elemType] = {
                     set: generateEndpointFct({ 
-                        endpoint: { method: 'POST', path: '/private/fnames/'+elemType+'/%' },
-                        input   : { required: ['user_id','imLocalYo','friendly_name'],pathInput: 'imLocalYo' }
+                        endpoint: { method: 'POST', path: '/fnames/'+elemType+'/%' },
+                        input   : { required: ['imLocalYo','friendly_name'],pathInput: 'imLocalYo' }
                     }), 
                     get: generateEndpointFct({ 
-                        endpoint: { method: 'GET', path: '/private/fnames/'+elemType+'/%' },
-                        input   : { required: ['user_id','imLocalYo'],pathInput: 'imLocalYo' },
+                        endpoint: { method: 'GET', path: '/fnames/'+elemType+'/%' },
+                        input   : { required: ['imLocalYo'],pathInput: 'imLocalYo' },
                         output  : { path: 'user/fname' }
                     }), 
                 }
