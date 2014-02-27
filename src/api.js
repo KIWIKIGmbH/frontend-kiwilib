@@ -39,18 +39,20 @@ utils.module.save('api', (function(){
                             singles.forEach(function(s){
                                 utils.assert(s['groups'],'missing groups');
                                 utils.assert(!s.isGroup,'a tag/sensor/user mistakenly set a group');
-                                s['groups'].forEach(function(group){
+                                if(typeof s['groups'] != "undefined") {
+                                  s['groups'].forEach(function(group){
                                     utils.assert(group.type&&group['id']);
                                     s = JSON.parse(JSON.stringify(s)); //angular doesn't want to scope several times over a single object
                                     if( groups[group.id] ) {
-                                        if( !groups[group.id].childs ) groups[group.id].childs = [];
-                                        groups[group.id].childs.push(s);
+                                      if( !groups[group.id].childs ) groups[group.id].childs = [];
+                                      groups[group.id].childs.push(s);
                                     }
                                     else {
-                                        utils.assert(false,'group contradictory both with and without permission');
-                                        ret.push(s);
+                                      utils.assert(false,'group contradictory both with and without permission');
+                                      ret.push(s);
                                     }
-                                });
+                                  });
+                                };
                             });
                             for(var i in groups) ret.push(groups[i]);
                             callback(ret);

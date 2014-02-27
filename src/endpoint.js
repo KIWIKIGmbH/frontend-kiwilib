@@ -183,9 +183,11 @@ utils.module.save('endpoint', (function(){
         }; 
     })(); 
 
-    function map_groups(groups,elemType){ 
+    function map_groups(groups,elemType) {
         utils.assert(groups && groups.constructor===Array && groups.length);
-        groups = (groups || []).map(function(group){
+        if(typeof groups == 'undefined')
+          return [];
+        groups = groups.map(function(group){
             group.type    = elemType;
             group.isGroup = true;
             group['id']   = group['group_id'];

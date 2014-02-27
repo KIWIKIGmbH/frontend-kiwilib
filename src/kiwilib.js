@@ -194,6 +194,8 @@ window.kiwilib = (function(){
                         sensor.permission.tag.groups  = ret.groups;
                         sensor.permission.tag.singles = scaffold['tags'].singles.filter(function(tag){
                             utils.assert(tag.groups,'missing groups');
+                            if(typeof groups == 'undefined')
+                              return [];
                             return tag.groups.some(function(group){ return ret.groups.indexOf(group.id)!==-1});
                         }).map(function(tag){return tag.id});
                     });
