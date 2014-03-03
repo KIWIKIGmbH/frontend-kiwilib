@@ -16,6 +16,7 @@ window.kiwilib = (function(){
                 pass: null,
                 req: function(argsObj){
                     argsObj = argsObj || {};
+                    var elem = this;
                     utils.exception(this.name && this.pass,'no username/password provided');
                     api.user.signin(this.name,this.pass,function(){
                         load.all();
