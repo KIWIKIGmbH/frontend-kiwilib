@@ -63,6 +63,7 @@ window.kiwilib = (function(){
             },
             claim      : function(id, key, argsObj) {
                 argsObj = argsObj || {};
+                var elem = this;
                 api.alter.system.claim_tag(key, 1, id,function(){
                     if( argsObj.callback ) argsObj.callback.apply(elem,arguments);
                 },argsObj.onError,argsObj.onSuccess);
