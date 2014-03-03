@@ -94,11 +94,11 @@ utils.module.save('api', (function(){
                 isSigned   : function(){ return endpoint._config.isSigned(); },
                 signout    : function(){ endpoint.session.signout   ();userName.del(); },
                 signoutAll : function(){ endpoint.session.signoutAll();userName.del(); },
-                signin     : function(uname,pw,callback){ 
+                signin     : function(uname,pw,callback, onSuccess, onError){ 
                     endpoint.session.signin(uname,pw,function(){
                         userName.set(uname);
                         if( callback ) callback();
-                    });
+                    }, onSuccess, onError);
                 }, 
                 signup     : function(uname,pw,callback){ 
                     var that = this;

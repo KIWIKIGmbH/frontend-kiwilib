@@ -14,11 +14,13 @@ window.kiwilib = (function(){
             signin: { 
                 name: null,
                 pass: null,
-                req: function(){
+                req: function(argsObj){
+                    argsObj = argsObj || {};
                     utils.exception(this.name && this.pass,'no username/password provided');
                     api.user.signin(this.name,this.pass,function(){
                         load.all();
-                    });
+                        if( argsObj.callback ) argsObj.callback.apply(elem,arguments);
+                    }, argsObj.onError, argsObj.onSuccess);
                 }
             }, 
             signup: { 
