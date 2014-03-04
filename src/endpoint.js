@@ -213,12 +213,13 @@ utils.module.save('endpoint', (function(){
     function generateElemGetter(elemType){ 
         var sensor_type;
         if( elemType==='sensor' ) sensor_type = {'sensor_type':'ignored'};
+        var postFix = elemType === 'permission/access' ? '' : 's';
         return generateEndpointFct({
-            endpoint : { method: 'GET', path: '/'+elemType+'s/' },
+            endpoint : { method: 'GET', path: '/'+elemType+ postFix + '/' },
           //input    : { required:['sensor_type'],default:elemType==='sensor'&&{'sensor_type':'ignored'}||undefined},
             input    : { default:sensor_type },
             output   : { 
-                path    : elemType+'s',
+                path    : elemType+postFix,
                 default : [],
                 map     : function(elem){
                     map_groups(elem['groups'],elemType);
