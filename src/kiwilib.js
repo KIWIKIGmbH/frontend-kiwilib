@@ -71,7 +71,10 @@ window.kiwilib = (function(){
                     if( argsObj.callback ) argsObj.callback.apply(elem,arguments);
                 },argsObj.onError,argsObj.onSuccess);
             }
-        }, 
+        },
+        access    : {
+            singles    : []
+        },
         users     : { 
             nodes      : [],
             addGroup   : function(name){
@@ -230,10 +233,12 @@ window.kiwilib = (function(){
                 }
             } 
         },
-        elems: function(type){ 
-            var elemObj = scaffold[type+'s'];
+        elems: function(type, typePostfix){ 
+            var elemObj = scaffold[type+typePostfix];
             if(elemObj.singles) elemObj.singles.length = 0;
-            elemObj.nodes.length = 0;
+            if (elemObj.nodes) {
+                elemObj.nodes.length = 0;
+            }
 
             utils.assert( api.user.isSigned() );
 
@@ -304,11 +309,13 @@ window.kiwilib = (function(){
                 */
             }); 
 
-            api.load.groups[type](function(res){ 
-                elemObj.nodes.length = 0;
-                res.forEach(function(elem){ elemObj.nodes.push(elem); });
-                mount(elemObj.nodes);
-            }); 
+            if (type in api.load.groups) {
+                api.load.groups[type](function(res){ 
+                    elemObj.nodes.length = 0;
+                    res.forEach(function(elem){ elemObj.nodes.push(elem); });
+                    mount(elemObj.nodes);
+                });
+            }
         }, 
         all: function(){ 
             if( !api.user.isSigned() ) {
@@ -316,9 +323,10 @@ window.kiwilib = (function(){
                 return;
             }
 
-            load.elems('sensor');
-            load.elems('tag'   );
-            load.elems('user'  );
+            load.elems('sensor', 's');
+            load.elems('tag',    's');
+            load.elems('user',   's');
+            load.elems('access', '');
         } 
     }; 
 

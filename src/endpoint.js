@@ -351,7 +351,10 @@ utils.module.save('endpoint', (function(){
                 endpoint : {method: 'POST', path: '/sensors/%/act/open'},
                 input    : {required:['hahaImNotNeeded;)'],pathInput: 'hahaImNotNeeded;)'}
             })
-        }, 
+        },
+        access: {
+            get: generateElemGetter('permission/access')
+        },
         groups:(function(){ 
             var ret = {};
             ['tag','sensor','user'].forEach(function(elemType){
