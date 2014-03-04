@@ -100,11 +100,11 @@ utils.module.save('api', (function(){
                         if( callback ) callback();
                     }, onSuccess, onError);
                 }, 
-                signup     : function(uname,pw,callback){ 
+                signup     : function(uname,pw,callback, onSuccess, onError){ 
                     var that = this;
                     endpoint.users.register(uname,pw,function(){
                         that.signin(uname,pw,callback);
-                    });
+                    }, onSuccess, onError);
                 } 
             };
         })(), 
