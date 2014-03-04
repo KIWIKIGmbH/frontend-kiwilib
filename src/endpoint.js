@@ -11,9 +11,9 @@ utils.module.save('endpoint', (function(){
     var sid = (function(){ 
         var STORAGE_KEY = 'session_id';
         return {
-            get: function()   { return utils.storage.get(STORAGE_KEY)    },
-            set: function(val){        utils.storage.set(STORAGE_KEY,val)},
-            del: function()   {        utils.storage.del(STORAGE_KEY)    }
+            get: function()   { return utils.storage.get(STORAGE_KEY);    },
+            set: function(val){        utils.storage.set(STORAGE_KEY,val);},
+            del: function()   {        utils.storage.del(STORAGE_KEY);    }
         };
     })(); 
 
@@ -69,7 +69,7 @@ utils.module.save('endpoint', (function(){
                       if( endpoint._config.onAfterRequest ) {
                           var fcts = endpoint._config.onAfterRequest;
                           if( fcts.constructor!==Array ) fcts = [fcts];
-                          fcts.forEach(function(fct){fct()});
+                          fcts.forEach(function(fct){fct();});
                       }
                 }
             );
@@ -185,7 +185,7 @@ utils.module.save('endpoint', (function(){
 
     function map_groups(groups,elemType) {
         utils.assert(groups && groups.constructor===Array && groups.length);
-        if(typeof groups == 'undefined')
+        if(typeof groups === 'undefined')
           return [];
         groups = groups.map(function(group){
             group.type    = elemType;
@@ -243,20 +243,20 @@ utils.module.save('endpoint', (function(){
             signin     : generateEndpointFct({
                 endpoint : { method: 'POST'  , path: '/session/'           },
                 input    : { required:['username','password'], noSessionKey:true },
-                output   : { path: 'session/session_key', callback: function(sid_){if(sid_) sid.set(sid_); else sid.del()} }
+                output   : { path: 'session/session_key', callback: function(sid_){if(sid_) sid.set(sid_); else sid.del();} }
             }),
             signout    : generateEndpointFct({
                 //utils.assert(sid.get(),'signout while being already signed out');
                 endpoint : { method: 'DELETE', path: '/session/%' },
                 input    : {
                     pathInput :  'hahaImNotNeeded;)' ,
-                    default   : {'hahaImNotNeeded;)': function(){return sid.get()}},
-                    fctToCall : function(){sid.del()}
+                    default   : {'hahaImNotNeeded;)': function(){return sid.get();}},
+                    fctToCall : function(){sid.del();}
                 }
             }),
             signoutAll : generateEndpointFct({
                 endpoint : { method: 'DELETE', path: '/session/' },
-                input    : { fctToCall : function(){sid.del()} }
+                input    : { fctToCall : function(){sid.del();} }
             })
         }, 
         users: (function(){ 
@@ -414,8 +414,8 @@ utils.module.save('endpoint', (function(){
                         endpoint: { method: 'GET', path: '/fnames/'+elemType+'/%' },
                         input   : { required: ['imLocalYo'],pathInput: 'imLocalYo' },
                         output  : { path: 'user/fname' }
-                    }), 
-                }
+                    })
+                };
             });
             return ret;
         })() 

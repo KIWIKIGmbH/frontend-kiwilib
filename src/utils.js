@@ -22,9 +22,9 @@ var utils = {
             });
         }
         var listeners=[];
-        ret.addListener=function(fct){ listeners.push(fct) };
+        ret.addListener=function(fct){ listeners.push(fct); };
         //'c'+'onsole' avoids hit on s/co
-        if( window['c'+'onsole'] ) ret.addListener(function(msg){window['c'+'onsole']['log'](msg)});
+        if( window['c'+'onsole'] ) ret.addListener(function(msg){window['c'+'onsole']['log'](msg);});
         return ret;
     })(), 
     exception: function(){ 
@@ -41,7 +41,7 @@ var utils = {
           load: function(moduleName) {
               return modules[moduleName];
           }
-        }
+        };
     })(), 
     storage: { 
         get: function get(key) {
@@ -62,7 +62,7 @@ var utils = {
             if( req.readyState===4 ) callback && callback(req.responseText,req);
         };
         if(method==='GET' && data) {
-            url += '?'+Object.keys(data).map(function(key){return key+'='+window.encodeURIComponent(data[key])}).join('&');
+            url += '?'+Object.keys(data).map(function(key){return key+'='+window.encodeURIComponent(data[key]);}).join('&');
         }
         req.open(method,url,true);
         req.setRequestHeader('Content-Type'    ,'application/json; charset=utf-8');

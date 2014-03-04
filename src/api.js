@@ -17,7 +17,7 @@ utils.module.save('api', (function(){
                         callback(current_user);
                     });
                 }
-            }
+            };
         })(); 
         return {
             load_nodes: function(endpoint_leaf,endpoint_node){ 
@@ -39,7 +39,7 @@ utils.module.save('api', (function(){
                             singles.forEach(function(s){
                                 utils.assert(s['groups'],'missing groups');
                                 utils.assert(!s.isGroup,'a tag/sensor/user mistakenly set a group');
-                                if(typeof s['groups'] != "undefined") {
+                                if(typeof s['groups'] !== "undefined") {
                                   s['groups'].forEach(function(group){
                                     utils.assert(group.type&&group['id']);
                                     s = JSON.parse(JSON.stringify(s)); //angular doesn't want to scope several times over a single object
@@ -58,7 +58,7 @@ utils.module.save('api', (function(){
                             callback(ret);
                         });
                     });
-                }
+                };
             }, 
             alter_group_add: function(endpoint_add){ 
                 //add to argument list a group id the current user belongs to
@@ -66,7 +66,7 @@ utils.module.save('api', (function(){
                     get_current_user_information(function(user){
                         endpoint_add(group_name,user.groups[0].id,callback);
                     });
-                }
+                };
             }, 
             friendly_names: function(elem_type,endpoint_name){ 
                 //prepend user_id to argument list
@@ -84,9 +84,9 @@ utils.module.save('api', (function(){
             var userName = (function(){ 
                 var STORAGE_KEY = 'user_name';
                 return {
-                    get: function()   { return utils.storage.get(STORAGE_KEY)    },
-                    set: function(val){        utils.storage.set(STORAGE_KEY,val)},
-                    del: function()   {        utils.storage.del(STORAGE_KEY)    }
+                    get: function()   { return utils.storage.get(STORAGE_KEY);    },
+                    set: function(val){        utils.storage.set(STORAGE_KEY,val);},
+                    del: function()   {        utils.storage.del(STORAGE_KEY);    }
                 };
             })(); 
             return {
@@ -166,8 +166,8 @@ utils.module.save('api', (function(){
         } 
     };
 
-    endpoint._config.onBeforeRequest=function(){ api.config.onBeforeRequest && api.config.onBeforeRequest() };
-    endpoint._config.onAfterRequest =function(){ api.config.onAfterRequest  && api.config.onAfterRequest () };
+    endpoint._config.onBeforeRequest=function(){ api.config.onBeforeRequest && api.config.onBeforeRequest(); };
+    endpoint._config.onAfterRequest =function(){ api.config.onAfterRequest  && api.config.onAfterRequest (); };
 
     return api;
 })());

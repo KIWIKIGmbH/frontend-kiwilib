@@ -50,7 +50,7 @@ window.kiwilib = (function(){
             singles    : [],
             nodes      : [],
             addGroup   : function(name){
-                api.alter.group.add.sensor(name,function(){load.all()});
+                api.alter.group.add.sensor(name,function(){load.all();});
             },
             setOrder   : function(orderObj){
                 utils.assert(orderObj['coordinates']);
@@ -62,7 +62,7 @@ window.kiwilib = (function(){
             singles    : [],
             nodes      : [],
             addGroup   : function(name){
-                api.alter.group.add.tag  (name,function(){load.all()});
+                api.alter.group.add.tag  (name,function(){load.all();});
             },
             claim      : function(id, key, argsObj) {
                 argsObj = argsObj || {};
@@ -75,7 +75,7 @@ window.kiwilib = (function(){
         users     : { 
             nodes      : [],
             addGroup   : function(name){
-                api.alter.group.add.user (name,function(){load.all()});
+                api.alter.group.add.user (name,function(){load.all();});
             }
         }, 
         selection : { 
@@ -94,7 +94,7 @@ window.kiwilib = (function(){
             load.all();
             //
         }, 
-        addDataChangeListener: function(l){dataChangeListeners.add(l)}
+        addDataChangeListener: function(l){dataChangeListeners.add(l);}
     }; 
     var scaffold_element = { 
         toggleSelect : function(){ 
@@ -201,17 +201,17 @@ window.kiwilib = (function(){
                         sensor.permission.tag.groups  = ret.groups;
                         sensor.permission.tag.singles = scaffold['tags'].singles.filter(function(tag){
                             utils.assert(tag.groups,'missing groups');
-                            if(typeof groups == 'undefined')
+                            if(typeof groups === 'undefined')
                               return [];
-                            return tag.groups.some(function(group){ return ret.groups.indexOf(group.id)!==-1});
-                        }).map(function(tag){return tag.id});
+                            return tag.groups.some(function(group){ return ret.groups.indexOf(group.id)!==-1;});
+                        }).map(function(tag){return tag.id;});
                     });
                 });
             }, 
             fromSelected: function(){ 
                 TYPES
-                .map(function(type){return scaffold[type+'s'].nodes})
-                .reduce(function(l,r){return l.concat(r)})
+                .map(function(type){return scaffold[type+'s'].nodes;})
+                .reduce(function(l,r){return l.concat(r);})
                 .forEach(function(node){
                     delete node.permission.toSelected;
                 });
