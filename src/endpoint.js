@@ -64,13 +64,13 @@ utils.module.save('endpoint', (function(){
                       isError = isError || !resp || resp.constructor!==Object || resp['status']!=='ok';
                       if( isError ) errHandling(req.status,req.statusText);
                       var callback_return_val = !isError&&resp || undefined;
-                      if( !isError ) if( param.onSuccess ) param.onSuccess( callback_return_val );
                       if( param.callback ) param.callback( callback_return_val );
                       if( endpoint._config.onAfterRequest ) {
                           var fcts = endpoint._config.onAfterRequest;
                           if( fcts.constructor!==Array ) fcts = [fcts];
                           fcts.forEach(function(fct){fct();});
                       }
+                      if( !isError ) if( param.onSuccess ) param.onSuccess( callback_return_val );
                 }
             );
         } 
