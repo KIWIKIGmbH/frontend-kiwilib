@@ -160,7 +160,14 @@ window.kiwilib = (function(){
             argsObj = argsObj || {};
             var elem = this;
             utils.assert(elem && elem.id && elem.type);
-            api.alter.open(elem.id,function(){
+            
+            // Don't fire this because only a door opened...
+            var oldBefore = api.config.onBeforeRequest;
+            var oldAfter = api.config.onAfterRequest;
+            api.config.onBeforeRequest = function() {};
+            api.config.onAfterRequest = function() {};
+            
+            api.alter.open(elem.id, function() {
                 //since function is set as callback.
                 //But it should be set as onSuccess attribute.
                 //In essence we are lying about the Success of opening doors
@@ -168,10 +175,15 @@ window.kiwilib = (function(){
                 elem.isOpen = true;
                 setTimeout(function(){
                     elem.isOpen = false;
-                    dataChangeListeners.fire();
+                    // dataChangeListeners.fire();
+                    // ^^^ Don't redraw the whole UI just because a door opened...
                 },config.DOOR_OPEN_DURATION);
                 if( argsObj.callback ) argsObj.callback.apply(null,arguments);
-            },argsObj.onError,argsObj.onSuccess);
+            }, argsObj.onError, function() {
+                api.config.onBeforeRequest = oldBefore;
+                api.config.onAfterRequest = oldAfter;
+                argsObj.onSuccess();
+            });
         }, 
         permission : {
             tag : { 
