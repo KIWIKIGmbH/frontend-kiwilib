@@ -196,43 +196,6 @@ window.kiwilib = (function(){
     })(); 
 
     var load = { 
-        permission: {
-            table: function(){ 
-                utils.assert(scaffold.sensors.singles.length);
-                scaffold.sensors.singles.forEach(function(sensor){
-                    api.load.permissions(sensor,function(ret){
-                        sensor.permission.tag.groups  = ret.groups;
-                        sensor.permission.tag.singles = scaffold['tags'].singles.filter(function(tag){
-                            utils.assert(tag.groups,'missing groups');
-                            if(typeof groups === 'undefined')
-                              return [];
-                            return tag.groups.some(function(group){ return ret.groups.indexOf(group.id)!==-1;});
-                        }).map(function(tag){return tag.id;});
-                    });
-                });
-            }, 
-            fromSelected: function(){ 
-                TYPES
-                .map(function(type){return scaffold[type+'s'].nodes;})
-                .reduce(function(l,r){return l.concat(r);})
-                .forEach(function(node){
-                    delete node.permission.toSelected;
-                });
-                dataChangeListeners.fire();
-
-                var selected = scaffold.selection.selected;
-                if(selected) {
-                    utils.assert( !selected.isGroup );
-                    api.load.permissions(selected,function(ret){
-                        utils.assert( ret.groups && ret.groups.constructor === Array);
-                        scaffold[selected.type==='sensor'?'tags':'sensors'].nodes.forEach(function(node){
-                            if( !node.isGroup ) return;
-                            node.permission.toSelected = ret.groups.indexOf(node['id'])!==-1?1:0;
-                        });
-                    });
-                }
-            } 
-        },
         elems: function(type, typePostfix){ 
             var elemObj = scaffold[type+typePostfix];
             if(elemObj.singles) elemObj.singles.length = 0;
@@ -260,9 +223,9 @@ window.kiwilib = (function(){
                     }
                 } 
                 elems.forEach(function(elem){
-                    utils.assert(TYPES.indexOf(elem.type)!==-1);
+                    utils.assert(TYPES.indexOf(elem.type)!==-1, "element undefined");
                     utils.assert(elem.isGroup===true || elem.isGroup===undefined);
-                    utils.assert(type===elem.type,type + elem.type);
+                    utils.assert(type===elem.type,"expected: " + type + ", got: " + elem.type);
 
                     /*noLint*/                                  mountScaffold(elem,scaffold_element);
                     if( !elem.isGroup && elem.type==='sensor' ) mountScaffold(elem,scaffold_element_sensor);
@@ -296,17 +259,8 @@ window.kiwilib = (function(){
                     var rd = get_distance(r);
                     if( ld === rd ) return 0;
                     return ld > rd ? -1 : 1;
-                }); 
-                mount(elemObj.singles);
-                if(type==='sensor') load.permission.table();
-                /* subsequent requests get 405. That's ok because friendly name is set as name when server gives us singles
-                elemObj.singles.forEach(function(single){
-                    api.load.friendly_names[single.type](single.id,function(name){
-                        single.name = name;
-                        console.log(single);
-                    });
                 });
-                */
+                mount(elemObj.singles);
             }); 
 
             if (type in api.load.groups) {
@@ -326,7 +280,6 @@ window.kiwilib = (function(){
             load.elems('sensor', 's');
             load.elems('tag',    's');
             load.elems('user',   's');
-            load.elems('access', '');
         } 
     }; 
 

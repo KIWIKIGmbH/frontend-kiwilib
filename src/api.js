@@ -111,21 +111,12 @@ utils.module.save('api', (function(){
         load: { 
             singles: {
                 tag    : endpoint.tags.get,
-                sensor : endpoint.sensors.get,
-                access : endpoint.access.get
+                sensor : endpoint.sensors.get
             },
             groups: {
-                sensor : generator.load_nodes(endpoint.sensors.get   ,endpoint.groups.sensor.get),
-                tag    : generator.load_nodes(endpoint.tags   .get   ,endpoint.groups.tag   .get),
-                user   : generator.load_nodes(endpoint.users  .getAll,endpoint.groups.user  .get)
+                sensor : endpoint.groups.sensor.get,
+                tag    : endpoint.groups.tag.get
             },
-            permissions: function(elem,cb){ 
-              if( !elem.isGroup ) {
-                  var type_opposite = elem.type==='sensor'?'tag':'sensor';
-                  endpoint.permissions[type_opposite+'s'](elem.id,cb);
-              }
-              else throw 'GET permission from groups not implemented yet';
-            }, 
             friendly_names : (function(){ 
                 var ret = {};
                 ['user','sensor','tag','gateway'].forEach(function(elem_type){

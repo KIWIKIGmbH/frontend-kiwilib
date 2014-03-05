@@ -208,23 +208,20 @@ utils.module.save('endpoint', (function(){
             delete             elem[elemType+'_group_id'];
         }
         return elem;
-    } 
+    }
 
     function generateElemGetter(elemType){ 
         var sensor_type;
         if( elemType==='sensor' ) sensor_type = {'sensor_type':'ignored'};
-        var postFix = elemType === 'permissions/access' ? '' : 's';
         return generateEndpointFct({
-            endpoint : { method: 'GET', path: '/'+elemType+ postFix + '/' },
-          //input    : { required:['sensor_type'],default:elemType==='sensor'&&{'sensor_type':'ignored'}||undefined},
+            endpoint : { method: 'GET', path: '/' + elemType + 's/' },
             input    : { default:sensor_type },
             output   : { 
-                path    : elemType+postFix,
+                path    : elemType + 's',
                 default : [],
-                map     : function(elem){
-                    map_groups(elem['groups'],elemType);
+                map     : function(elem) {
                     return map_elem(elem,elemType);
-                }
+                } 
             } 
         });
     } 
