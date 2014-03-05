@@ -213,7 +213,7 @@ utils.module.save('endpoint', (function(){
     function generateElemGetter(elemType){ 
         var sensor_type;
         if( elemType==='sensor' ) sensor_type = {'sensor_type':'ignored'};
-        var postFix = elemType === 'permission/access' ? '' : 's';
+        var postFix = elemType === 'permissions/access' ? '' : 's';
         return generateEndpointFct({
             endpoint : { method: 'GET', path: '/'+elemType+ postFix + '/' },
           //input    : { required:['sensor_type'],default:elemType==='sensor'&&{'sensor_type':'ignored'}||undefined},
@@ -354,7 +354,7 @@ utils.module.save('endpoint', (function(){
             })
         },
         access: {
-            get: generateElemGetter('permission/access')
+            get: generateElemGetter('permissions/access')
         },
         groups:(function(){ 
             var ret = {};
