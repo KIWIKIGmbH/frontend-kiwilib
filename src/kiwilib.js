@@ -153,7 +153,16 @@ window.kiwilib = (function(){
             var elem = this;
             utils.assert(elem && elem.id && elem.type);
             api.alter.group.remove[elem.type](elem.id,function(){load.all();});
-        }
+        },
+        rename: function(new_val, argsObj){ 
+            argsObj = argsObj || {};
+            var elem = this;
+            utils.assert(elem && elem.id && elem.type);
+            var name = elem.isGroup ? elem.type + '_group' : elem.type;
+            api.alter.friendly_names[name](elem.id,new_val,function(){
+                if( argsObj.callback ) argsObj.callback.apply(elem,arguments);
+            },argsObj.onError,argsObj.onSuccess);
+        } 
     }; 
     var scaffold_element_sensor = { 
         open : function(argsObj){ 

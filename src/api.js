@@ -120,7 +120,7 @@ utils.module.save('api', (function(){
             },
             friendly_names : (function(){ 
                 var ret = {};
-                ['user','sensor','tag','gateway'].forEach(function(elem_type){
+                ['user','sensor','tag','gateway', 'tag_group'].forEach(function(elem_type){
                     ret[elem_type] = generator.friendly_names(elem_type,'get');
                 });
                 return ret;
@@ -151,7 +151,7 @@ utils.module.save('api', (function(){
             open : endpoint.sensors.open,
             friendly_names : (function(){ 
                 var ret = {};
-                ['user','sensor','tag','gateway'].forEach(function(elem_type){
+                ['user','sensor','tag','gateway', 'tag_group'].forEach(function(elem_type){
                     ret[elem_type] = generator.friendly_names(elem_type,'set');
                 });
                 return ret;

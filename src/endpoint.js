@@ -406,7 +406,7 @@ utils.module.save('endpoint', (function(){
         })(), 
         friendly_names:(function(){ 
             var ret = {};
-            ['tag','sensor','user','gateway'].forEach(function(elemType){
+            ['tag','sensor','user','gateway', 'tag_group'].forEach(function(elemType){
                 ret[elemType] = {
                     set: generateEndpointFct({ 
                         endpoint: { method: 'POST', path: '/fnames/'+elemType+'/%' },
