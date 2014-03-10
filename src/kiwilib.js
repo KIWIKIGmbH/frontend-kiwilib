@@ -292,6 +292,7 @@ window.kiwilib = (function(){
             load.elems('sensor', 's');
             load.elems('tag',    's');
             load.elems('user',   's');
+            load.elems('access', '');
         } 
     }; 
 

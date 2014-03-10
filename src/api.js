@@ -111,6 +111,7 @@ utils.module.save('api', (function(){
         load: { 
             singles: {
                 tag    : endpoint.tags.get,
+                access : endpoint.access.get,
                 sensor : endpoint.sensors.get
             },
             groups: {

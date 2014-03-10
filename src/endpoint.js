@@ -210,14 +210,15 @@ utils.module.save('endpoint', (function(){
         return elem;
     }
 
-    function generateElemGetter(elemType){ 
+    function generateElemGetter(elemType, postFix, path){
+        var outputPath = path ? path : elemType + postFix;
         var sensor_type;
         if( elemType==='sensor' ) sensor_type = {'sensor_type':'ignored'};
         return generateEndpointFct({
-            endpoint : { method: 'GET', path: '/' + elemType + 's/' },
+            endpoint : { method: 'GET', path: '/' + elemType + postFix + '/' },
             input    : { default:sensor_type },
             output   : { 
-                path    : elemType + 's',
+                path    : outputPath,
                 default : [],
                 map     : function(elem) {
                     return map_elem(elem,elemType);
@@ -298,7 +299,7 @@ utils.module.save('endpoint', (function(){
             };
         })(), 
         tags:{ 
-            get: generateElemGetter('tag'),
+            get: generateElemGetter('tag', 's', null),
             claim: generateEndpointFct({ 
                     endpoint : { method: 'POST', path: '/tags/claim' },
                     input    : { required:['tag_key','user_group_id','tag_id'] }
@@ -344,14 +345,14 @@ utils.module.save('endpoint', (function(){
             };
         })(), 
         sensors:{ 
-            get: generateElemGetter('sensor'),
+            get: generateElemGetter('sensor', 's', null),
             open: generateEndpointFct({
                 endpoint : {method: 'POST', path: '/sensors/%/act/open'},
                 input    : {required:['hahaImNotNeeded;)'],pathInput: 'hahaImNotNeeded;)'}
             })
         },
         access: {
-            get: generateElemGetter('permissions/access')
+            get: generateElemGetter('permissions/access', '', 'accesses')
         },
         groups:(function(){ 
             var ret = {};
