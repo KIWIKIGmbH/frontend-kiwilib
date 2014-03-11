@@ -64,10 +64,10 @@ window.kiwilib = (function(){
             addGroup   : function(name){
                 api.alter.group.add.tag  (name,function(){load.all();});
             },
-            claim      : function(id, key, argsObj) {
+            claim      : function(id, key, userGroupId, argsObj) {
                 argsObj = argsObj || {};
                 var elem = this;
-                api.alter.system.claim_tag(key, 1, id,function(){
+                api.alter.system.claim_tag(key, userGroupId, id,function(){
                     if( argsObj.callback ) argsObj.callback.apply(elem,arguments);
                 },argsObj.onError,argsObj.onSuccess);
             }
