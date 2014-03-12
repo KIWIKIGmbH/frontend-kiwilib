@@ -200,8 +200,10 @@ utils.module.save('endpoint', (function(){
     function map_elem(elem,elemType){ 
         elem['id']   = elem[elemType+'_id'];
         delete         elem[elemType+'_id'];
-        elem['name'] = elem[elemType+'_name'] || 'no name';
-        delete         elem[elemType+'_name'];
+        if (!'name' in elem) {
+            elem['name'] = elem[elemType+'_name'] || 'no name';
+            delete         elem[elemType+'_name'];
+        }
         elem.type    = elemType;
         if(elem[elemType+'_group_id']) {
             elem['group_id'] = elem[elemType+'_group_id'];
