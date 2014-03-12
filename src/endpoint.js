@@ -211,11 +211,9 @@ utils.module.save('endpoint', (function(){
     }
 
     function generateElemGetter(elemType, postFix){
-        var sensor_type;
-        if( elemType==='sensor' ) sensor_type = {'sensor_type':'ignored'};
         return generateEndpointFct({
             endpoint : { method: 'GET', path: '/' + elemType + postFix + '/' },
-            input    : { default:sensor_type },
+            input    : { },
             output   : { 
                 path    : elemType + postFix,
                 default : [],
