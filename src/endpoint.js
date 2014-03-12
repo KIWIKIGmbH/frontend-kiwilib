@@ -200,7 +200,7 @@ utils.module.save('endpoint', (function(){
     function map_elem(elem,elemType){ 
         elem['id']   = elem[elemType+'_id'];
         delete         elem[elemType+'_id'];
-        if (!'name' in elem) {
+        if (!('name' in elem)) {
             elem['name'] = elem[elemType+'_name'] || 'no name';
             delete         elem[elemType+'_name'];
         }
