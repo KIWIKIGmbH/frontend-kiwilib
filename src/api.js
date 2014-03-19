@@ -79,6 +79,7 @@ utils.module.save('api', (function(){
     })();
 
     var api = {
+        configuration : endpoint.configuration,
         config : {},
         user : (function(){ 
             var userName = (function(){ 

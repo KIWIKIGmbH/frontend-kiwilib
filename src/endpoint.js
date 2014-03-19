@@ -419,7 +419,10 @@ utils.module.save('endpoint', (function(){
                 };
             });
             return ret;
-        })() 
+        })(),
+        configuration: function() {
+            return config;
+        }
     }; 
 
     endpoint._call   = _call;

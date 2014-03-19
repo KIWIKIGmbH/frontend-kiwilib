@@ -97,7 +97,8 @@ window.kiwilib = (function(){
             load.all();
             //
         }, 
-        addDataChangeListener: function(l){dataChangeListeners.add(l);}
+        addDataChangeListener: function(l){dataChangeListeners.add(l);},
+        configuration: api.configuration
     }; 
     var scaffold_element = { 
         toggleSelect : function(){ 
